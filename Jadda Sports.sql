@@ -1,4 +1,3 @@
-
 CREATE DATABASE TIENDA_DEPORTIVA;
 USE TIENDA_DEPORTIVA;
 
@@ -507,4 +506,210 @@ SELECT
 FROM VENTAS;
 
 
+/* =====================================================
+   PROCEDIMIENTOS ALMACENADOS SIN PARÁMETROS 10
+   ===================================================== */
+DELIMITER //
+-- 1. Mostrar todos los productos
+-- Beneficio: permite ver el catálogo completo rápidamente
+CREATE PROCEDURE sp_mostrar_productos()
+BEGIN
+    SELECT * FROM PRODUCTOS;
+END //
 
+-- 2. Mostrar todos los clientes
+-- Beneficio: facilita consultar los clientes registrados
+CREATE PROCEDURE sp_mostrar_clientes()
+BEGIN
+    SELECT * FROM CLIENTES;
+END //
+
+-- 3. Mostrar todas las ventas
+-- Beneficio: permite revisar el historial de ventas
+CREATE PROCEDURE sp_mostrar_ventas()
+BEGIN
+    SELECT * FROM VENTAS;
+END //
+
+-- 4. Mostrar inventario actual
+-- Beneficio: permite controlar el stock disponible
+CREATE PROCEDURE sp_ver_inventario()
+BEGIN
+    SELECT P.NOMBRE, I.CANTIDAD, I.FECHA_ACTUALIZACION
+    FROM INVENTARIO I
+    JOIN PRODUCTOS P ON I.ID_PRODUCTO = P.ID;
+END //
+
+-- 5. Mostrar proveedores
+-- Beneficio: facilita la gestión de proveedores
+CREATE PROCEDURE sp_ver_proveedores()
+BEGIN
+    SELECT * FROM PROVEEDORES;
+END //
+
+-- 6. Mostrar empleados
+-- Beneficio: permite consultar el personal contratado
+CREATE PROCEDURE sp_ver_empleados()
+BEGIN
+    SELECT * FROM EMPLEADOS;
+END //
+
+-- 7. Mostrar categorías
+-- Beneficio: permite administrar las categorías de productos
+CREATE PROCEDURE sp_ver_categorias()
+BEGIN
+    SELECT * FROM CATEGORIAS;
+END //
+
+-- 8. Mostrar métodos de pago
+-- Beneficio: permite conocer las opciones disponibles
+CREATE PROCEDURE sp_ver_metodos_pago()
+BEGIN
+    SELECT * FROM METODOS_PAGO;
+END //
+
+-- 9. Mostrar productos con bajo stock (<20)
+-- Beneficio: ayuda a identificar productos que necesitan reposición
+CREATE PROCEDURE sp_stock_bajo()
+BEGIN
+    SELECT NOMBRE, STOCK
+    FROM PRODUCTOS
+    WHERE STOCK < 20;
+END //
+
+-- 10. Mostrar total general de ventas
+-- Beneficio: permite conocer el ingreso total de la tienda
+CREATE PROCEDURE sp_total_ventas()
+BEGIN
+    SELECT COUNT(ID_VENTA) AS TOTAL_VENTAS,
+           SUM(TOTAL) AS INGRESO_TOTAL
+    FROM VENTAS;
+END //
+
+
+/* =====================================================
+   PROCEDIMIENTOS CON 1 PARÁMETRO 5
+   ===================================================== */
+
+-- 11. Buscar producto por ID
+-- Beneficio: permite encontrar un producto específico
+CREATE PROCEDURE sp_buscar_producto(IN p_id INT)
+BEGIN
+    SELECT * 
+    FROM PRODUCTOS
+    WHERE ID = p_id;
+END //
+
+-- 12. Mostrar ventas de un cliente
+-- Beneficio: permite ver el historial de compras de un cliente
+CREATE PROCEDURE sp_ventas_cliente(IN p_cliente INT)
+BEGIN
+    SELECT *
+    FROM VENTAS
+    WHERE ID_CLIENTE = p_cliente;
+END //
+
+-- 13. Mostrar productos por categoría
+-- Beneficio: permite filtrar productos según su categoría
+CREATE PROCEDURE sp_productos_categoria(IN p_categoria INT)
+BEGIN
+    SELECT *
+    FROM PRODUCTOS
+    WHERE ID_CATEGORIA = p_categoria;
+END //
+
+-- 14. Buscar usuario por correo
+-- Beneficio: útil para autenticación y consultas
+CREATE PROCEDURE sp_buscar_usuario_email(IN p_email VARCHAR(100))
+BEGIN
+    SELECT *
+    FROM USUARIOS
+    WHERE EMAIL = p_email;
+END //
+
+-- 15. Mostrar ventas realizadas por un empleado
+-- Beneficio: permite evaluar el desempeño del empleado
+CREATE PROCEDURE sp_ventas_empleado(IN p_empleado INT)
+BEGIN
+    SELECT *
+    FROM VENTAS
+    WHERE ID_EMPLEADO = p_empleado;
+END //
+
+
+/* =====================================================
+   PROCEDIMIENTOS CON 2 PARÁMETROS 5
+   ===================================================== */
+
+-- 16. Insertar un nuevo cliente (nombre y apellido)
+-- Beneficio: facilita el registro de clientes
+CREATE PROCEDURE sp_insertar_cliente(
+    IN p_nombre VARCHAR(100),
+    IN p_apellido VARCHAR(100)
+)
+BEGIN
+    INSERT INTO CLIENTES
+    (NOMBRE_CLIENTE, APELLIDO_CLIENTE, TIPODO_CLIENTE, DOCUMENTO_CLIENTE, ID_USUARIO)
+    VALUES
+    (p_nombre, p_apellido, 'CC', FLOOR(RAND()*1000000000), 1);
+END //
+
+-- 17. Actualizar precio de un producto
+-- Beneficio: permite modificar precios fácilmente
+CREATE PROCEDURE sp_actualizar_precio(
+    IN p_id INT,
+    IN p_precio DECIMAL(10,2)
+)
+BEGIN
+    UPDATE PRODUCTOS
+    SET PRECIO = p_precio
+    WHERE ID = p_id;
+END //
+
+-- 18. Actualizar stock de un producto
+-- Beneficio: permite mantener actualizado el inventario
+CREATE PROCEDURE sp_actualizar_stock(
+    IN p_id INT,
+    IN p_stock INT
+)
+BEGIN
+    UPDATE PRODUCTOS
+    SET STOCK = p_stock
+    WHERE ID = p_id;
+END //
+
+-- 19. Eliminar producto de favoritos
+-- Beneficio: permite gestionar los productos favoritos
+CREATE PROCEDURE sp_eliminar_favorito(
+    IN p_usuario INT,
+    IN p_producto INT
+)
+BEGIN
+    DELETE FROM FAVORITOS
+    WHERE ID_USUARIO = p_usuario
+    AND ID_PRODUCTO = p_producto;
+END //
+
+-- 20. Mostrar ventas entre dos fechas
+-- Beneficio: permite generar reportes por periodo
+CREATE PROCEDURE sp_ventas_por_fecha(
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE
+)
+BEGIN
+    SELECT *
+    FROM VENTAS
+    WHERE DATE(FECHA_VENTA) BETWEEN p_fecha_inicio AND p_fecha_fin;
+END //
+
+DELIMITER ;
+
+-- Llamadas
+
+CALL sp_mostrar_productos();
+
+CALL sp_buscar_producto(1);
+
+CALL sp_actualizar_precio(1, 130000);
+
+CALL sp_ventas_por_fecha('2025-01-01','2025-01-31');
