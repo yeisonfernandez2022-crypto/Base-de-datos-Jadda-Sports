@@ -37,6 +37,8 @@ CREATE TABLE USUARIOS (
     APELLIDO_USUARIO VARCHAR(100),
     EMAIL VARCHAR(100) UNIQUE,
     USUARIO VARCHAR(100) UNIQUE,
+    telefono varchar(255),
+    direccion varchar(255),
     CONTRASENA VARCHAR(255),
     FECHA_REGISTRO DATE,
     ID_ROL INT,
@@ -189,6 +191,7 @@ CREATE TABLE PRODUCTOS (
     COLOR VARCHAR(50),
     TALLA VARCHAR(10),
     PRECIO DECIMAL(10,2),
+    IMAGEN VARCHAR(500),
     STOCK INT,
     DESCRIPCION TEXT,
     ID_PROVEEDOR INT,
@@ -459,257 +462,19 @@ VALUES
 (1, 1, '2025-06-01'),
 (2, 2, '2025-06-02');
 
--- Obtener el total general de ventas.
-SELECT 
-    COUNT(ID_VENTA) AS TOTAL_VENTAS_REALIZADAS,
-    SUM(TOTAL) AS TOTAL_GENERAL_VENTAS
-FROM VENTAS;
-
--- Obtener el promedio general de ventas.
-SELECT 
-    AVG(TOTAL) AS PROMEDIO_GENERAL_VENTAS
-FROM VENTAS;
-
--- Mostrar los productos cuyo total vendido sea superior al promedio general
-SELECT 
-    P.NOMBRE,
-    SUM(DV.SUBTOTAL) AS TOTAL_VENDIDO_PRODUCTO
-FROM DETALLE_VENTAS DV
-JOIN PRODUCTOS P ON DV.ID_PRODUCTO = P.ID
-GROUP BY P.NOMBRE
-HAVING TOTAL_VENDIDO_PRODUCTO > (
-    SELECT AVG(TOTAL) FROM VENTAS
-);
-
--- Mostrar la categoría con menor volumen de ventas.
-SELECT 
-    C.NOMBRE_CATEGORIA,
-    SUM(DV.SUBTOTAL) AS TOTAL_VENTAS_CATEGORIA
-FROM DETALLE_VENTAS DV
-JOIN PRODUCTOS P ON DV.ID_PRODUCTO = P.ID
-JOIN CATEGORIAS C ON P.ID_CATEGORIA = C.ID_CATEGORIA
-GROUP BY C.NOMBRE_CATEGORIA
-HAVING TOTAL_VENTAS_CATEGORIA = (
-    SELECT MIN(TOTAL_CATEGORIA)
-    FROM (
-        SELECT SUM(DV2.SUBTOTAL) AS TOTAL_CATEGORIA
-        FROM DETALLE_VENTAS DV2
-        JOIN PRODUCTOS P2 ON DV2.ID_PRODUCTO = P2.ID
-        GROUP BY P2.ID_CATEGORIA
-    ) AS SUBCONSULTA
-);
-
--- Mostrar la venta más alta y la más baja.
-SELECT 
-    MAX(TOTAL) AS VENTA_MAS_ALTA,
-    MIN(TOTAL) AS VENTA_MAS_BAJA
-FROM VENTAS;
-
-
-/* =====================================================
-   PROCEDIMIENTOS ALMACENADOS SIN PARÁMETROS 10
-   ===================================================== */
-DELIMITER //
--- 1. Mostrar todos los productos
--- Beneficio: permite ver el catálogo completo rápidamente
-CREATE PROCEDURE sp_mostrar_productos()
-BEGIN
-    SELECT * FROM PRODUCTOS;
-END //
-
--- 2. Mostrar todos los clientes
--- Beneficio: facilita consultar los clientes registrados
-CREATE PROCEDURE sp_mostrar_clientes()
-BEGIN
-    SELECT * FROM CLIENTES;
-END //
-
--- 3. Mostrar todas las ventas
--- Beneficio: permite revisar el historial de ventas
-CREATE PROCEDURE sp_mostrar_ventas()
-BEGIN
-    SELECT * FROM VENTAS;
-END //
-
--- 4. Mostrar inventario actual
--- Beneficio: permite controlar el stock disponible
-CREATE PROCEDURE sp_ver_inventario()
-BEGIN
-    SELECT P.NOMBRE, I.CANTIDAD, I.FECHA_ACTUALIZACION
-    FROM INVENTARIO I
-    JOIN PRODUCTOS P ON I.ID_PRODUCTO = P.ID;
-END //
-
--- 5. Mostrar proveedores
--- Beneficio: facilita la gestión de proveedores
-CREATE PROCEDURE sp_ver_proveedores()
-BEGIN
-    SELECT * FROM PROVEEDORES;
-END //
-
--- 6. Mostrar empleados
--- Beneficio: permite consultar el personal contratado
-CREATE PROCEDURE sp_ver_empleados()
-BEGIN
-    SELECT * FROM EMPLEADOS;
-END //
-
--- 7. Mostrar categorías
--- Beneficio: permite administrar las categorías de productos
-CREATE PROCEDURE sp_ver_categorias()
-BEGIN
-    SELECT * FROM CATEGORIAS;
-END //
-
--- 8. Mostrar métodos de pago
--- Beneficio: permite conocer las opciones disponibles
-CREATE PROCEDURE sp_ver_metodos_pago()
-BEGIN
-    SELECT * FROM METODOS_PAGO;
-END //
-
--- 9. Mostrar productos con bajo stock (<20)
--- Beneficio: ayuda a identificar productos que necesitan reposición
-CREATE PROCEDURE sp_stock_bajo()
-BEGIN
-    SELECT NOMBRE, STOCK
-    FROM PRODUCTOS
-    WHERE STOCK < 20;
-END //
-
--- 10. Mostrar total general de ventas
--- Beneficio: permite conocer el ingreso total de la tienda
-CREATE PROCEDURE sp_total_ventas()
-BEGIN
-    SELECT COUNT(ID_VENTA) AS TOTAL_VENTAS,
-           SUM(TOTAL) AS INGRESO_TOTAL
-    FROM VENTAS;
-END //
-
-
-/* =====================================================
-   PROCEDIMIENTOS CON 1 PARÁMETRO 5
-   ===================================================== */
-
--- 11. Buscar producto por ID
--- Beneficio: permite encontrar un producto específico
-CREATE PROCEDURE sp_buscar_producto(IN p_id INT)
-BEGIN
-    SELECT * 
-    FROM PRODUCTOS
-    WHERE ID = p_id;
-END //
-
--- 12. Mostrar ventas de un cliente
--- Beneficio: permite ver el historial de compras de un cliente
-CREATE PROCEDURE sp_ventas_cliente(IN p_cliente INT)
-BEGIN
-    SELECT *
-    FROM VENTAS
-    WHERE ID_CLIENTE = p_cliente;
-END //
-
--- 13. Mostrar productos por categoría
--- Beneficio: permite filtrar productos según su categoría
-CREATE PROCEDURE sp_productos_categoria(IN p_categoria INT)
-BEGIN
-    SELECT *
-    FROM PRODUCTOS
-    WHERE ID_CATEGORIA = p_categoria;
-END //
-
--- 14. Buscar usuario por correo
--- Beneficio: útil para autenticación y consultas
-CREATE PROCEDURE sp_buscar_usuario_email(IN p_email VARCHAR(100))
-BEGIN
-    SELECT *
-    FROM USUARIOS
-    WHERE EMAIL = p_email;
-END //
-
--- 15. Mostrar ventas realizadas por un empleado
--- Beneficio: permite evaluar el desempeño del empleado
-CREATE PROCEDURE sp_ventas_empleado(IN p_empleado INT)
-BEGIN
-    SELECT *
-    FROM VENTAS
-    WHERE ID_EMPLEADO = p_empleado;
-END //
-
-
-/* =====================================================
-   PROCEDIMIENTOS CON 2 PARÁMETROS 5
-   ===================================================== */
-
--- 16. Insertar un nuevo cliente (nombre y apellido)
--- Beneficio: facilita el registro de clientes
-CREATE PROCEDURE sp_insertar_cliente(
-    IN p_nombre VARCHAR(100),
-    IN p_apellido VARCHAR(100)
-)
-BEGIN
-    INSERT INTO CLIENTES
-    (NOMBRE_CLIENTE, APELLIDO_CLIENTE, TIPODO_CLIENTE, DOCUMENTO_CLIENTE, ID_USUARIO)
-    VALUES
-    (p_nombre, p_apellido, 'CC', FLOOR(RAND()*1000000000), 1);
-END //
-
--- 17. Actualizar precio de un producto
--- Beneficio: permite modificar precios fácilmente
-CREATE PROCEDURE sp_actualizar_precio(
-    IN p_id INT,
-    IN p_precio DECIMAL(10,2)
-)
-BEGIN
-    UPDATE PRODUCTOS
-    SET PRECIO = p_precio
-    WHERE ID = p_id;
-END //
-
--- 18. Actualizar stock de un producto
--- Beneficio: permite mantener actualizado el inventario
-CREATE PROCEDURE sp_actualizar_stock(
-    IN p_id INT,
-    IN p_stock INT
-)
-BEGIN
-    UPDATE PRODUCTOS
-    SET STOCK = p_stock
-    WHERE ID = p_id;
-END //
-
--- 19. Eliminar producto de favoritos
--- Beneficio: permite gestionar los productos favoritos
-CREATE PROCEDURE sp_eliminar_favorito(
-    IN p_usuario INT,
-    IN p_producto INT
-)
-BEGIN
-    DELETE FROM FAVORITOS
-    WHERE ID_USUARIO = p_usuario
-    AND ID_PRODUCTO = p_producto;
-END //
-
--- 20. Mostrar ventas entre dos fechas
--- Beneficio: permite generar reportes por periodo
-CREATE PROCEDURE sp_ventas_por_fecha(
-    IN p_fecha_inicio DATE,
-    IN p_fecha_fin DATE
-)
-BEGIN
-    SELECT *
-    FROM VENTAS
-    WHERE DATE(FECHA_VENTA) BETWEEN p_fecha_inicio AND p_fecha_fin;
-END //
-
-DELIMITER ;
-
--- Llamadas
-
-CALL sp_mostrar_productos();
-
-CALL sp_buscar_producto(1);
-
-CALL sp_actualizar_precio(1, 130000);
-
-CALL sp_ventas_por_fecha('2025-01-01','2025-01-31');
+ALTER TABLE PRODUCTOS ADD IMAGEN VARCHAR(500);
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab' WHERE ID = 1;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519' WHERE ID = 2;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1517649763962-0c623066013b' WHERE ID = 3;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1519861531473-9200262188bf' WHERE ID = 4;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e' WHERE ID = 5;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348' WHERE ID = 6;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb' WHERE ID = 7;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1602143407151-7111542de6e8' WHERE ID = 8;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1600180758895-1c1bdb0f9e7b' WHERE ID = 9;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad' WHERE ID = 10;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1600180758890-6b94519a8ba5' WHERE ID = 11;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61' WHERE ID = 12;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1594737625785-cb7f8c6c5b60' WHERE ID = 13;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1599058917212-d750089bc07e' WHERE ID = 14;
+UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb' WHERE ID = 15;
