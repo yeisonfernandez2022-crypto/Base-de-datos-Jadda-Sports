@@ -31,36 +31,42 @@ VALUES
 
 CREATE TABLE USUARIOS (
     ID_USUARIO INT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRE_USUARIO VARCHAR(100),
-    APELLIDO_USUARIO VARCHAR(100),
-    EMAIL VARCHAR(100) UNIQUE,
-    USUARIO VARCHAR(100) UNIQUE,
-    telefono varchar(255),
-    direccion varchar(255),
-    CONTRASENA VARCHAR(255),
+    NOMBRE_USUARIO VARCHAR(100) NOT NULL,
+    APELLIDO_USUARIO VARCHAR(100) NOT NULL,
+    EMAIL VARCHAR(100) UNIQUE NOT NULL,
+    USUARIO VARCHAR(100) UNIQUE NOT NULL,
+    telefono VARCHAR(255),
+    direccion VARCHAR(255),
+    CONTRASENA VARCHAR(255) NOT NULL,
     FECHA_REGISTRO DATE,
     ID_ROL INT,
+    
+    -- Campos para Verificación y Recuperación
+    CONFIRMADO TINYINT DEFAULT 0,          
+    TOKEN VARCHAR(6) DEFAULT NULL,        
+    TOKEN_EXPIRA DATETIME DEFAULT NULL,  
+    
     FOREIGN KEY (ID_ROL) REFERENCES ROLES(ID_ROL)
 );
 
 INSERT INTO USUARIOS 
-(NOMBRE_USUARIO, APELLIDO_USUARIO, EMAIL, USUARIO, CONTRASENA, FECHA_REGISTRO, ID_ROL)
+(ID_USUARIO, NOMBRE_USUARIO, APELLIDO_USUARIO, EMAIL, USUARIO, CONTRASENA, FECHA_REGISTRO, ID_ROL, CONFIRMADO)
 VALUES
-('Juan', 'Torres', 'juan.torres@mail.com', 'juan.torres', 'clave123', '2024-01-12', 2),
-('Daniela', 'Ríos', 'daniela.rios@mail.com', 'daniela.rios', 'clave123', '2023-08-05', 2),
-('Felipe', 'Cano', 'felipe.cano@mail.com', 'felipe.cano', 'clave123', '2024-05-19', 2),
-('Valeria', 'Mendoza', 'valeria.mendoza@mail.com', 'valeria.mendoza', 'clave123', '2025-02-02', 2),
-('Santiago', 'Pardo', 'santiago.pardo@mail.com', 'santiago.pardo', 'clave123', '2023-11-22', 2),
-('Manuela', 'Gil', 'manuela.gil@mail.com', 'manuela.gil', 'clave123', '2024-06-01', 2),
-('Cristian', 'Navarro', 'cristian.navarro@mail.com', 'cristian.navarro', 'clave123', '2025-01-15', 2),
-('Laura', 'Bautista', 'laura.bautista@mail.com', 'laura.bautista', 'clave123', '2024-09-09', 2),
-('Kevin', 'Acosta', 'kevin.acosta@mail.com', 'kevin.acosta', 'clave123', '2023-12-12', 2),
-('Sara', 'Quintero', 'sara.quintero@mail.com', 'sara.quintero', 'clave123', '2024-07-07', 2),
-('Miguel', 'Lara', 'miguel.lara@mail.com', 'miguel.lara', 'clave123', '2024-03-18', 2),
-('Paola', 'Vega', 'paola.vega@mail.com', 'paola.vega', 'clave123', '2023-10-10', 2),
-('Andrés', 'Ruiz', 'andres.ruiz@mail.com', 'andres.ruiz', 'clave123', '2024-04-04', 2),
-('Tatiana', 'Ocampo', 'tatiana.ocampo@mail.com', 'tatiana.ocampo', 'clave123', '2024-02-20', 2),
-('Julian', 'Soto', 'julian.soto@mail.com', 'julian.soto', 'clave123', '2025-03-01', 2);
+(1, 'Juan', 'Torres', 'juan.torres@mail.com', 'juan.torres', 'clave123', '2024-01-12', 2, 1),
+(2, 'Daniela', 'Ríos', 'daniela.rios@mail.com', 'daniela.rios', 'clave123', '2023-08-05', 2, 1),
+(3, 'Felipe', 'Cano', 'felipe.cano@mail.com', 'felipe.cano', 'clave123', '2024-05-19', 2, 1),
+(4, 'Valeria', 'Mendoza', 'valeria.mendoza@mail.com', 'valeria.mendoza', 'clave123', '2025-02-02', 2, 1),
+(5, 'Santiago', 'Pardo', 'santiago.pardo@mail.com', 'santiago.pardo', 'clave123', '2023-11-22', 2, 1),
+(6, 'Manuela', 'Gil', 'manuela.gil@mail.com', 'manuela.gil', 'clave123', '2024-06-01', 2, 1),
+(7, 'Cristian', 'Navarro', 'cristian.navarro@mail.com', 'cristian.navarro', 'clave123', '2025-01-15', 2, 1),
+(8, 'Laura', 'Bautista', 'laura.bautista@mail.com', 'laura.bautista', 'clave123', '2024-09-09', 2, 1),
+(9, 'Kevin', 'Acosta', 'kevin.acosta@mail.com', 'kevin.acosta', 'clave123', '2023-12-12', 2, 1),
+(10, 'Sara', 'Quintero', 'sara.quintero@mail.com', 'sara.quintero', 'clave123', '2024-07-07', 2, 1),
+(11, 'Miguel', 'Lara', 'miguel.lara@mail.com', 'miguel.lara', 'clave123', '2024-03-18', 2, 1),
+(12, 'Paola', 'Vega', 'paola.vega@mail.com', 'paola.vega', 'clave123', '2023-10-10', 2, 1),
+(13, 'Andrés', 'Ruiz', 'andres.ruiz@mail.com', 'andres.ruiz', 'clave123', '2024-04-04', 2, 1),
+(14, 'Tatiana', 'Ocampo', 'tatiana.ocampo@mail.com', 'tatiana.ocampo', 'clave123', '2024-02-20', 2, 1),
+(15, 'Julian', 'Soto', 'julian.soto@mail.com', 'julian.soto', 'clave123', '2025-03-01', 2, 1);
 
 
 -- ==============================
@@ -463,6 +469,9 @@ VALUES
 
 
 
+
+
+
 UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab' WHERE ID = 1;
 UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519' WHERE ID = 2;
 UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1517649763962-0c623066013b' WHERE ID = 3;
@@ -479,12 +488,10 @@ UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1594737625785-c
 UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1599058917212-d750089bc07e' WHERE ID = 14;
 UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb' WHERE ID = 15;
 
-ALTER TABLE USUARIOS 
-ADD CONFIRMADO TINYINT DEFAULT 0,
-ADD TOKEN VARCHAR(255);
 
 select * from usuarios;
 DELETE FROM USUARIOS WHERE EMAIL = 'yeisiton922@gmail.com';
+
 
 -- Vista de usuarios logueados 
 
@@ -518,30 +525,24 @@ WHERE FECHA_REGISTRO >= CURDATE() - INTERVAL 20 DAY;
 
 
 
-
-
-
-
-USE TIENDA_DEPORTIVA;
-
 -- ==============================
 -- FUNCIONES DE AGREGACIÓN (CONSULTAS)
 -- ==============================
 
-SELECT COUNT(*) AS TOTAL_VENTAS FROM VENTAS;
-SELECT SUM(TOTAL) AS INGRESOS FROM VENTAS;
-SELECT AVG(TOTAL) AS PROMEDIO FROM VENTAS;
-SELECT MAX(PRECIO) AS MAX_PRECIO FROM PRODUCTOS;
-SELECT MIN(PRECIO) AS MIN_PRECIO FROM PRODUCTOS;
+SELECT COUNT(*) AS TOTAL_VENTAS FROM VENTAS; -- Cuenta el total de ventas registradas
+SELECT SUM(TOTAL) AS INGRESOS FROM VENTAS; -- Suma todos los ingresos de ventas
+SELECT AVG(TOTAL) AS PROMEDIO FROM VENTAS; -- Calcula el promedio de las ventas
+SELECT MAX(PRECIO) AS MAX_PRECIO FROM PRODUCTOS; -- Obtiene el precio más alto
+SELECT MIN(PRECIO) AS MIN_PRECIO FROM PRODUCTOS; -- Obtiene el precio más bajo
 
 SELECT ID_CLIENTE, SUM(TOTAL) TOTAL
 FROM VENTAS
-GROUP BY ID_CLIENTE;
+GROUP BY ID_CLIENTE; -- Total gastado por cada cliente
 
 SELECT ID_CLIENTE, SUM(TOTAL) TOTAL
 FROM VENTAS
 GROUP BY ID_CLIENTE
-HAVING TOTAL > 200000;
+HAVING TOTAL > 200000; -- Clientes que han gastado más de 200000
 
 
 -- ==============================
@@ -552,28 +553,36 @@ DELIMITER $$
 
 -- SIN PARÁMETROS
 CREATE PROCEDURE sp_listar_productos()
-BEGIN SELECT * FROM PRODUCTOS; END $$
+BEGIN SELECT * FROM PRODUCTOS; END $$ -- Lista todos los productos
+CALL sp_listar_productos();
 
 CREATE PROCEDURE sp_listar_clientes()
-BEGIN SELECT * FROM CLIENTES; END $$
+BEGIN SELECT * FROM CLIENTES; END $$ -- Lista todos los clientes
+CALL sp_listar_clientes();
 
 CREATE PROCEDURE sp_listar_ventas()
-BEGIN SELECT * FROM VENTAS; END $$
+BEGIN SELECT * FROM VENTAS; END $$ -- Lista todas las ventas
+CALL sp_listar_ventas();
 
 CREATE PROCEDURE sp_listar_empleados()
-BEGIN SELECT * FROM EMPLEADOS; END $$
+BEGIN SELECT * FROM EMPLEADOS; END $$ -- Lista todos los empleados
+CALL sp_listar_empleados();
 
 CREATE PROCEDURE sp_listar_proveedores()
-BEGIN SELECT * FROM PROVEEDORES; END $$
+BEGIN SELECT * FROM PROVEEDORES; END $$ -- Lista todos los proveedores
+CALL sp_listar_proveedores();
 
 CREATE PROCEDURE sp_productos_stock()
-BEGIN SELECT * FROM PRODUCTOS WHERE STOCK > 0; END $$
+BEGIN SELECT * FROM PRODUCTOS WHERE STOCK > 0; END $$ -- Productos con stock disponible
+CALL sp_productos_stock();
 
 CREATE PROCEDURE sp_productos_sin_stock()
-BEGIN SELECT * FROM PRODUCTOS WHERE STOCK = 0; END $$
+BEGIN SELECT * FROM PRODUCTOS WHERE STOCK = 0; END $$ -- Productos sin stock
+CALL sp_productos_sin_stock();
 
 CREATE PROCEDURE sp_total_ingresos()
-BEGIN SELECT SUM(TOTAL) FROM VENTAS; END $$
+BEGIN SELECT SUM(TOTAL) FROM VENTAS; END $$ -- Total de ingresos
+CALL sp_total_ingresos();
 
 CREATE PROCEDURE sp_top_clientes()
 BEGIN 
@@ -581,94 +590,152 @@ SELECT ID_CLIENTE, SUM(TOTAL) TOTAL
 FROM VENTAS
 GROUP BY ID_CLIENTE
 ORDER BY TOTAL DESC;
-END $$
+END $$ -- Clientes ordenados por mayor compra
+CALL sp_top_clientes();
 
 CREATE PROCEDURE sp_ventas_hoy()
-BEGIN SELECT * FROM VENTAS WHERE DATE(FECHA_VENTA)=CURDATE(); END $$
+BEGIN SELECT * FROM VENTAS WHERE DATE(FECHA_VENTA)=CURDATE(); END $$ -- Ventas del día actual
+CALL sp_ventas_hoy();
 
--- PARÁMETRO SIMPLE
+
+-- PARÁMETRO SIMPLE IN 
 CREATE PROCEDURE sp_buscar_producto(IN nombre VARCHAR(100))
 BEGIN 
 SELECT * FROM PRODUCTOS WHERE NOMBRE LIKE CONCAT('%', nombre, '%'); 
-END $$
+END $$ -- Busca productos por nombre
+CALL sp_buscar_producto('camisa');
 
 CREATE PROCEDURE sp_ventas_cliente(IN id INT)
-BEGIN SELECT * FROM VENTAS WHERE ID_CLIENTE = id; END $$
+BEGIN SELECT * FROM VENTAS WHERE ID_CLIENTE = id; END $$ -- Ventas de un cliente
+CALL sp_ventas_cliente(1);
 
 CREATE PROCEDURE sp_productos_categoria(IN cat INT)
-BEGIN SELECT * FROM PRODUCTOS WHERE ID_CATEGORIA = cat; END $$
+BEGIN SELECT * FROM PRODUCTOS WHERE ID_CATEGORIA = cat; END $$ -- Productos por categoría
+CALL sp_productos_categoria(2);
 
 CREATE PROCEDURE sp_eliminar_producto(IN id INT)
-BEGIN DELETE FROM PRODUCTOS WHERE ID = id; END $$
+BEGIN DELETE FROM PRODUCTOS WHERE ID = id; END $$ -- Elimina un producto
+CALL sp_eliminar_producto(5);
 
 CREATE PROCEDURE sp_stock_producto(IN id INT)
-BEGIN SELECT STOCK FROM PRODUCTOS WHERE ID = id; END $$
+BEGIN SELECT STOCK FROM PRODUCTOS WHERE ID = id; END $$ -- Consulta stock de producto
+CALL sp_stock_producto(3);
 
 -- DOBLE PARÁMETRO
 CREATE PROCEDURE sp_actualizar_precio(IN id INT, IN nuevo DECIMAL(10,2))
-BEGIN UPDATE PRODUCTOS SET PRECIO = nuevo WHERE ID = id; END $$
+BEGIN UPDATE PRODUCTOS SET PRECIO = nuevo WHERE ID = id; END $$ -- Actualiza precio
+CALL sp_actualizar_precio(1, 50000);
 
 CREATE PROCEDURE sp_ventas_rango(IN f1 DATE, IN f2 DATE)
-BEGIN SELECT * FROM VENTAS WHERE FECHA_VENTA BETWEEN f1 AND f2; END $$
+BEGIN SELECT * FROM VENTAS WHERE FECHA_VENTA BETWEEN f1 AND f2; END $$ -- Ventas entre fechas
+CALL sp_ventas_rango('2024-01-01', '2024-12-31');
 
 CREATE PROCEDURE sp_insertar_producto(IN nombre VARCHAR(100), IN precio DECIMAL(10,2))
-BEGIN INSERT INTO PRODUCTOS(NOMBRE, PRECIO) VALUES(nombre, precio); END $$
+BEGIN INSERT INTO PRODUCTOS(NOMBRE, PRECIO) VALUES(nombre, precio); END $$ -- Inserta producto
+CALL sp_insertar_producto('Zapatos', 80000);
 
 CREATE PROCEDURE sp_actualizar_stock(IN id INT, IN cantidad INT)
-BEGIN UPDATE PRODUCTOS SET STOCK = cantidad WHERE ID = id; END $$
+BEGIN UPDATE PRODUCTOS SET STOCK = cantidad WHERE ID = id; END $$ -- Actualiza stock
+CALL sp_actualizar_stock(1, 50);
 
 CREATE PROCEDURE sp_detalle_venta(IN venta INT, IN producto INT)
 BEGIN 
 SELECT * FROM DETALLE_VENTAS
 WHERE ID_VENTA = venta AND ID_PRODUCTO = producto;
-END $$
+END $$ -- Detalle específico de venta
+CALL sp_detalle_venta(1, 2);
 
 -- CON OUT
 CREATE PROCEDURE sp_total_ventas(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM VENTAS; END $$
+BEGIN SELECT COUNT(*) INTO total FROM VENTAS; END $$ -- Total de ventas
+SET @total = 0;
+CALL sp_total_ventas(@total);
+SELECT @total;
 
 CREATE PROCEDURE sp_ingresos(OUT total DECIMAL(10,2))
-BEGIN SELECT SUM(TOTAL) INTO total FROM VENTAS; END $$
+BEGIN SELECT SUM(TOTAL) INTO total FROM VENTAS; END $$ -- Total ingresos
+SET @ingresos = 0;
+CALL sp_ingresos(@ingresos);
+SELECT @ingresos;
 
 CREATE PROCEDURE sp_stock_total(OUT total INT)
-BEGIN SELECT SUM(STOCK) INTO total FROM PRODUCTOS; END $$
+BEGIN SELECT SUM(STOCK) INTO total FROM PRODUCTOS; END $$ -- Stock total
+SET @stock = 0;
+CALL sp_stock_total(@stock);
+SELECT @stock;
 
 CREATE PROCEDURE sp_clientes_total(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM CLIENTES; END $$
+BEGIN SELECT COUNT(*) INTO total FROM CLIENTES; END $$ -- Total clientes
+SET @clientes = 0;
+CALL sp_clientes_total(@clientes);
+SELECT @clientes;
 
 CREATE PROCEDURE sp_productos_total(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM PRODUCTOS; END $$
+BEGIN SELECT COUNT(*) INTO total FROM PRODUCTOS; END $$ -- Total productos
+SET @productos = 0;
+CALL sp_productos_total(@productos);
+SELECT @productos;
 
 CREATE PROCEDURE sp_precio_max(OUT maximo DECIMAL(10,2))
-BEGIN SELECT MAX(PRECIO) INTO maximo FROM PRODUCTOS; END $$
+BEGIN SELECT MAX(PRECIO) INTO maximo FROM PRODUCTOS; END $$ -- Precio máximo
+SET @max = 0;
+CALL sp_precio_max(@max);
+SELECT @max;
 
 CREATE PROCEDURE sp_precio_min(OUT minimo DECIMAL(10,2))
-BEGIN SELECT MIN(PRECIO) INTO minimo FROM PRODUCTOS; END $$
+BEGIN SELECT MIN(PRECIO) INTO minimo FROM PRODUCTOS; END $$ -- Precio mínimo
+SET @min = 0;
+CALL sp_precio_min(@min);
+SELECT @min;
 
 CREATE PROCEDURE sp_promedio_ventas(OUT promedio DECIMAL(10,2))
-BEGIN SELECT AVG(TOTAL) INTO promedio FROM VENTAS; END $$
+BEGIN SELECT AVG(TOTAL) INTO promedio FROM VENTAS; END $$ -- Promedio ventas
+SET @prom = 0;
+CALL sp_promedio_ventas(@prom);
+SELECT @prom;
 
 CREATE PROCEDURE sp_ventas_completadas(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM VENTAS WHERE ESTADO='COMPLETADA'; END $$
+BEGIN SELECT COUNT(*) INTO total FROM VENTAS WHERE ESTADO='COMPLETADA'; END $$ -- Ventas completadas
+SET @ventas = 0;
+CALL sp_ventas_completadas(@ventas);
+SELECT @ventas;
 
 CREATE PROCEDURE sp_productos_stock_bajo(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM PRODUCTOS WHERE STOCK < 20; END $$
+BEGIN SELECT COUNT(*) INTO total FROM PRODUCTOS WHERE STOCK < 20; END $$ -- Stock bajo
+SET @bajo = 0;
+CALL sp_productos_stock_bajo(@bajo);
+SELECT @bajo;
 
 -- INOUT
 CREATE PROCEDURE sp_aumentar_precio(INOUT precio DECIMAL(10,2))
-BEGIN SET precio = precio * 1.10; END $$
+BEGIN SET precio = precio * 1.10; END $$ -- Aumenta precio 10%
+SET @precio = 10000;
+CALL sp_aumentar_precio(@precio);
+SELECT @precio;
 
 CREATE PROCEDURE sp_descuento(INOUT precio DECIMAL(10,2))
-BEGIN SET precio = precio * 0.90; END $$
+BEGIN SET precio = precio * 0.90; END $$ -- Aplica descuento 10%
+SET @precio = 10000;
+CALL sp_descuento(@precio);
+SELECT @precio;
 
 CREATE PROCEDURE sp_sumar_stock(INOUT stock INT)
-BEGIN SET stock = stock + 10; END $$
+BEGIN SET stock = stock + 10; END $$ -- Suma 10 al stock
+SET @stock = 20;
+CALL sp_sumar_stock(@stock);
+SELECT @stock;
 
 CREATE PROCEDURE sp_restar_stock(INOUT stock INT)
-BEGIN SET stock = stock - 5; END $$
+BEGIN SET stock = stock - 5; END $$ -- Resta 5 al stock
+SET @stock = 20;
+CALL sp_restar_stock(@stock);
+SELECT @stock;
 
 CREATE PROCEDURE sp_impuesto(INOUT precio DECIMAL(10,2))
-BEGIN SET precio = precio * 1.19; END $$
+BEGIN SET precio = precio * 1.19; END $$ -- Aplica IVA 19%
+SET @precio = 10000;
+CALL sp_impuesto(@precio);
+SELECT @precio;
 
 DELIMITER ;
 
@@ -680,46 +747,55 @@ DELIMITER ;
 CREATE VIEW vista_ventas_clientes AS
 SELECT c.NOMBRE_CLIENTE, v.TOTAL
 FROM CLIENTES c
-JOIN VENTAS v ON c.ID_CLIENTE = v.ID_CLIENTE;
+JOIN VENTAS v ON c.ID_CLIENTE = v.ID_CLIENTE; -- Relaciona clientes con sus compras
+SELECT * FROM vista_ventas_clientes;
 
 CREATE VIEW vista_productos_categoria AS
 SELECT p.NOMBRE, c.NOMBRE_CATEGORIA
 FROM PRODUCTOS p
-JOIN CATEGORIAS c ON p.ID_CATEGORIA = c.ID_CATEGORIA;
+JOIN CATEGORIAS c ON p.ID_CATEGORIA = c.ID_CATEGORIA; -- Productos con categoría
+SELECT * FROM vista_productos_categoria;
 
 CREATE VIEW vista_stock AS
-SELECT NOMBRE, STOCK FROM PRODUCTOS;
+SELECT NOMBRE, STOCK FROM PRODUCTOS; -- Muestra stock de productos
+SELECT * FROM vista_stock;
 
 CREATE VIEW vista_top_clientes AS
 SELECT ID_CLIENTE, SUM(TOTAL) TOTAL
 FROM VENTAS
-GROUP BY ID_CLIENTE;
+GROUP BY ID_CLIENTE; -- Total comprado por cliente
+SELECT * FROM vista_top_clientes;
 
 CREATE VIEW vista_empleados_ventas AS
 SELECT e.NOMBRE_EMPLEADO, COUNT(v.ID_VENTA) VENTAS
 FROM EMPLEADOS e
 JOIN VENTAS v ON e.ID_EMPLEADO = v.ID_EMPLEADO
-GROUP BY e.ID_EMPLEADO;
+GROUP BY e.ID_EMPLEADO; -- Ventas por empleado
+SELECT * FROM vista_empleados_ventas;
 
 CREATE VIEW vista_productos_caros AS
-SELECT * FROM PRODUCTOS WHERE PRECIO > 100000;
+SELECT * FROM PRODUCTOS WHERE PRECIO > 100000; -- Productos caros
+SELECT * FROM vista_productos_caros;
 
 CREATE VIEW vista_productos_baratos AS
-SELECT * FROM PRODUCTOS WHERE PRECIO < 50000;
+SELECT * FROM PRODUCTOS WHERE PRECIO < 50000; -- Productos baratos
+SELECT * FROM vista_productos_baratos;
 
 CREATE VIEW vista_inventario AS
 SELECT p.NOMBRE, i.CANTIDAD
 FROM INVENTARIO i
-JOIN PRODUCTOS p ON p.ID = i.ID_PRODUCTO;
+JOIN PRODUCTOS p ON p.ID = i.ID_PRODUCTO; -- Inventario con productos
+SELECT * FROM vista_inventario;
 
 CREATE VIEW vista_ventas_hoy AS
-SELECT * FROM VENTAS WHERE DATE(FECHA_VENTA)=CURDATE();
+SELECT * FROM VENTAS WHERE DATE(FECHA_VENTA)=CURDATE(); -- Ventas del día
+SELECT * FROM vista_ventas_hoy;
 
 CREATE VIEW vista_descuentos AS
 SELECT p.NOMBRE, d.PORCENTAJE
 FROM PRODUCTOS p
-JOIN DESCUENTOS d ON p.ID_DESCUENTO = d.ID_DESCUENTO;
-
+JOIN DESCUENTOS d ON p.ID_DESCUENTO = d.ID_DESCUENTO; -- Productos con descuento
+SELECT * FROM vista_descuentos;
 
 -- ==============================
 -- TRIGGERS
@@ -733,35 +809,35 @@ FOR EACH ROW
 BEGIN
 UPDATE PRODUCTOS SET STOCK = STOCK - NEW.CANTIDAD
 WHERE ID = NEW.ID_PRODUCTO;
-END $$
+END $$ -- Reduce stock al vender
 
 CREATE TRIGGER tr_no_stock_negativo
 BEFORE UPDATE ON PRODUCTOS
 FOR EACH ROW
 BEGIN
 IF NEW.STOCK < 0 THEN SET NEW.STOCK = 0; END IF;
-END $$
+END $$ -- Evita stock negativo
 
 CREATE TRIGGER tr_fecha_usuario
 BEFORE INSERT ON USUARIOS
 FOR EACH ROW
 BEGIN
 SET NEW.FECHA_REGISTRO = CURDATE();
-END $$
+END $$ -- Fecha automática usuario
 
 CREATE TRIGGER tr_precio
 BEFORE INSERT ON PRODUCTOS
 FOR EACH ROW
 BEGIN
 IF NEW.PRECIO <= 0 THEN SET NEW.PRECIO = 1000; END IF;
-END $$
+END $$ -- Precio mínimo permitido
 
 CREATE TRIGGER tr_estado
 BEFORE INSERT ON VENTAS
 FOR EACH ROW
 BEGIN
 SET NEW.ESTADO = 'COMPLETADA';
-END $$
+END $$ -- Estado automático venta
 
 CREATE TRIGGER tr_aumentar_stock
 AFTER INSERT ON INVENTARIO
@@ -769,14 +845,14 @@ FOR EACH ROW
 BEGIN
 UPDATE PRODUCTOS SET STOCK = STOCK + NEW.CANTIDAD
 WHERE ID = NEW.ID_PRODUCTO;
-END $$
+END $$ -- Aumenta stock
 
 CREATE TRIGGER tr_no_delete_cliente
 BEFORE DELETE ON CLIENTES
 FOR EACH ROW
 BEGIN
 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='No eliminar clientes';
-END $$
+END $$ -- Bloquea eliminar clientes
 
 CREATE TRIGGER tr_log_delete_producto
 AFTER DELETE ON PRODUCTOS
@@ -784,21 +860,21 @@ FOR EACH ROW
 BEGIN
 INSERT INTO MOVIMIENTOS_STOCK(ID_PRODUCTO,TIPO_MOVIMIENTO,CANTIDAD,FECHA)
 VALUES(OLD.ID,'ELIMINADO',0,CURDATE());
-END $$
+END $$ -- Registra eliminación producto
 
 CREATE TRIGGER tr_email
 BEFORE INSERT ON USUARIOS
 FOR EACH ROW
 BEGIN
 IF NEW.EMAIL NOT LIKE '%@%' THEN SET NEW.EMAIL='correo@default.com'; END IF;
-END $$
+END $$ -- Corrige email inválido
 
 CREATE TRIGGER tr_update_inventario
 BEFORE UPDATE ON INVENTARIO
 FOR EACH ROW
 BEGIN
 SET NEW.FECHA_ACTUALIZACION = CURDATE();
-END $$
+END $$ -- Actualiza fecha inventario
 
 CREATE TRIGGER tr_log_venta
 AFTER INSERT ON VENTAS
@@ -806,21 +882,21 @@ FOR EACH ROW
 BEGIN
 INSERT INTO MOVIMIENTOS_STOCK(ID_PRODUCTO,TIPO_MOVIMIENTO,CANTIDAD,FECHA)
 VALUES(1,'VENTA',1,CURDATE());
-END $$
+END $$ -- Registro de venta
 
 CREATE TRIGGER tr_cantidad
 BEFORE INSERT ON DETALLE_VENTAS
 FOR EACH ROW
 BEGIN
 IF NEW.CANTIDAD <= 0 THEN SET NEW.CANTIDAD = 1; END IF;
-END $$
+END $$ -- Evita cantidad inválida
 
 CREATE TRIGGER tr_update_precio
 BEFORE UPDATE ON PRODUCTOS
 FOR EACH ROW
 BEGIN
 IF NEW.PRECIO < 1000 THEN SET NEW.PRECIO = 1000; END IF;
-END $$
+END $$ -- Precio mínimo al actualizar
 
 CREATE TRIGGER tr_cliente_user
 AFTER INSERT ON USUARIOS
@@ -828,13 +904,13 @@ FOR EACH ROW
 BEGIN
 INSERT INTO CLIENTES(NOMBRE_CLIENTE,APELLIDO_CLIENTE,TIPODO_CLIENTE,DOCUMENTO_CLIENTE,ID_USUARIO)
 VALUES(NEW.NOMBRE_USUARIO,NEW.APELLIDO_USUARIO,'CC',UUID(),NEW.ID_USUARIO);
-END $$
+END $$ -- Crea cliente automático
 
 CREATE TRIGGER tr_no_delete_venta
 BEFORE DELETE ON VENTAS
 FOR EACH ROW
 BEGIN
 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='No eliminar ventas';
-END $$
+END $$ -- Bloquea eliminar ventas
 
 DELIMITER ;
