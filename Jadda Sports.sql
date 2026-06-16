@@ -1,16 +1,17 @@
-CREATE DATABASE TIENDA_DEPORTIVA;
-USE TIENDA_DEPORTIVA;
+drop database if exists jadda_sports_db;
+CREATE DATABASE jadda_sports_db;
+USE jadda_sports_db;
 
+-- ==============================
 -- ROLES
-
+-- ==============================
 CREATE TABLE ROLES (
     ID_ROL INT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE_ROL VARCHAR(50),
-    DESCRIPCION varchar(100)
+    DESCRIPCION VARCHAR(100)
 );
 
-INSERT INTO ROLES (NOMBRE_ROL, DESCRIPCION)
-VALUES
+INSERT INTO ROLES (NOMBRE_ROL, DESCRIPCION) VALUES
 ('Administrador', 'Control total del sistema'),
 ('Cliente', 'Usuario que compra productos'),
 ('Empleado', 'Trabajador de la tienda'),
@@ -24,11 +25,9 @@ VALUES
 ('Marketing', 'Publicidad y promociones'),
 ('Invitado', 'Acceso limitado');
 
-
 -- ==============================
 -- USUARIOS
 -- ==============================
-
 CREATE TABLE USUARIOS (
     ID_USUARIO INT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE_USUARIO VARCHAR(100) NOT NULL,
@@ -40,12 +39,12 @@ CREATE TABLE USUARIOS (
     CONTRASENA VARCHAR(255) NOT NULL,
     FECHA_REGISTRO DATE,
     ID_ROL INT,
-    
-    -- Campos para Verificación y Recuperación
     CONFIRMADO TINYINT DEFAULT 0,          
     TOKEN VARCHAR(6) DEFAULT NULL,        
-    TOKEN_EXPIRA DATETIME DEFAULT NULL,  
-    
+    TOKEN_EXPIRA DATETIME DEFAULT NULL, 
+    foto_url VARCHAR(255) DEFAULT NULL,
+    AUTH_PROVIDER VARCHAR(50) DEFAULT 'local', -- Para saber si es local, google o facebook
+    PROVIDER_ID VARCHAR(255) DEFAULT NULL,     -- ID único que te da Google/Facebook
     FOREIGN KEY (ID_ROL) REFERENCES ROLES(ID_ROL)
 );
 
@@ -68,11 +67,9 @@ VALUES
 (14, 'Tatiana', 'Ocampo', 'tatiana.ocampo@mail.com', 'tatiana.ocampo', 'clave123', '2024-02-20', 2, 1),
 (15, 'Julian', 'Soto', 'julian.soto@mail.com', 'julian.soto', 'clave123', '2025-03-01', 2, 1);
 
-
 -- ==============================
 -- CLIENTES
 -- ==============================
-
 CREATE TABLE CLIENTES (
     ID_CLIENTE INT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE_CLIENTE VARCHAR(200) NOT NULL,
@@ -104,11 +101,9 @@ VALUES
 ('Tatiana', 'Ocampo', 'CC', '1200000014', 'Cra 20 #45-19', '3016667788', 14),
 ('Julian', 'Soto', 'CC', '1200000015', 'Calle 90 #12-30', '3017778899', 15);
 
-
 -- ==============================
 -- PROVEEDORES
 -- ==============================
-
 CREATE TABLE PROVEEDORES (
     ID_PROVEEDOR INT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE_PROVEEDOR VARCHAR(200),
@@ -138,19 +133,16 @@ VALUES
 ('Umbro Colombia', '3117778899', 'ventas@umbro.com', 'Cali', 'Sebastián Díaz', '900123014'),
 ('Decathlon Proveedores SAS', '3121112233', 'contacto@decathlon.com', 'Bogotá D.C.', 'Paola Vega', '900123015');
 
-
 -- ==============================
 -- CATEGORIAS
 -- ==============================
-
 CREATE TABLE CATEGORIAS (
     ID_CATEGORIA INT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE_CATEGORIA VARCHAR(100) NOT NULL,
     DESCRIPCION VARCHAR(100)
 );
 
-INSERT INTO CATEGORIAS (NOMBRE_CATEGORIA, DESCRIPCION)
-VALUES
+INSERT INTO CATEGORIAS (NOMBRE_CATEGORIA, DESCRIPCION) VALUES
 ('Fútbol', 'Productos relacionados con fútbol'),
 ('Baloncesto', 'Artículos de baloncesto'),
 ('Running', 'Productos para correr'),
@@ -167,11 +159,9 @@ VALUES
 ('Tecnología deportiva', 'Relojes y gadgets'),
 ('Ofertas', 'Productos con descuento');
 
-
 -- ==============================
 -- DESCUENTOS
 -- ==============================
-
 CREATE TABLE DESCUENTOS (
     ID_DESCUENTO INT PRIMARY KEY AUTO_INCREMENT,
     DESCRIPCION VARCHAR(255),
@@ -180,56 +170,468 @@ CREATE TABLE DESCUENTOS (
     FECHA_FIN DATE
 );
 
-INSERT INTO DESCUENTOS (DESCRIPCION, PORCENTAJE, FECHA_INICIO, FECHA_FIN)
-VALUES
+INSERT INTO DESCUENTOS (DESCRIPCION, PORCENTAJE, FECHA_INICIO, FECHA_FIN) VALUES
 ('Descuento temporada fútbol', 10, '2025-06-01', '2025-07-01');
 
 -- ==============================
 -- PRODUCTOS
 -- ==============================
-
 CREATE TABLE PRODUCTOS (
     ID INT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE VARCHAR(255),
     MARCA VARCHAR(100),
-    COLOR VARCHAR(50),
-    TALLA VARCHAR(10),
     PRECIO DECIMAL(10,2),
-    IMAGEN VARCHAR(500),
-    STOCK INT,
     DESCRIPCION TEXT,
     ID_PROVEEDOR INT,
     ID_CATEGORIA INT,
-    ID_DESCUENTO INT,
-    FOREIGN KEY (ID_PROVEEDOR) REFERENCES PROVEEDORES(ID_PROVEEDOR),
-    FOREIGN KEY (ID_CATEGORIA) REFERENCES CATEGORIAS(ID_CATEGORIA),
-    FOREIGN KEY (ID_DESCUENTO) REFERENCES DESCUENTOS(ID_DESCUENTO)
+    ID_DESCUENTO INT
 );
 
-INSERT INTO PRODUCTOS
-(NOMBRE, MARCA, COLOR, TALLA, PRECIO, STOCK, DESCRIPCION, ID_PROVEEDOR, ID_CATEGORIA, ID_DESCUENTO)
+INSERT INTO PRODUCTOS (NOMBRE, MARCA, PRECIO, DESCRIPCION, ID_PROVEEDOR, ID_CATEGORIA, ID_DESCUENTO)
 VALUES
-('Sudadera deportiva', 'Nike', 'Gris', 'L', 120000, 60, 'Sudadera térmica', 1, 3, NULL),
-('Chaqueta impermeable', 'Adidas', 'Negro', 'M', 180000, 40, 'Resistente al agua', 2, 3, NULL),
-('Guayos profesionales', 'Puma', 'Blanco', '42', 220000, 25, 'Guayos para césped natural', 1, 1, NULL),
-('Balón baloncesto', 'Spalding', 'Naranja', '7', 110000, 50, 'Balón oficial NBA', 2, 1, NULL),
-('Cuerda para saltar', 'Everlast', 'Negro', 'U', 35000, 100, 'Cuerda ajustable', 1, 4, NULL),
-('Bolso deportivo', 'Adidas', 'Azul', 'U', 95000, 70, 'Bolso amplio', 2, 3, NULL),
-('Protector bucal', 'Everlast', 'Transparente', 'U', 25000, 150, 'Protección dental', 1, 4, NULL),
-('Termo deportivo', 'Nike', 'Rojo', '1L', 45000, 90, 'Acero inoxidable', 2, 4, NULL),
-('Rodilleras', 'Reebok', 'Negro', 'M', 60000, 80, 'Soporte deportivo', 1, 4, NULL),
-('Gorra deportiva', 'Puma', 'Blanco', 'U', 40000, 120, 'Ajustable', 2, 3, NULL),
-('Camiseta selección', 'Adidas', 'Amarillo', 'L', 150000, 30, 'Edición especial', 1, 1, NULL),
-('Pesas 5kg', 'BodyFit', 'Gris', '5kg', 50000, 60, 'Recubiertas', 2, 4, NULL),
-('Elíptica doméstica', 'ProFit', 'Negro', 'U', 1800000, 8, 'Equipo cardio', 1, 4, NULL),
-('Mancuernas 20kg', 'BodyFit', 'Negro', '20kg', 150000, 20, 'Set completo', 2, 4, NULL),
-('Espinilleras', 'Nike', 'Negro', 'M', 70000, 55, 'Protección fútbol', 1, 1, NULL);
+('Guayos profesionales', 'Puma', 220000, 'Guayos para césped natural', 1, 1, NULL),
+('Balón Al Rihla Pro', 'Adidas', 320000, 'Balón oficial', 2, 1, NULL),
+('Espinilleras', 'Nike', 70000, 'Protección fútbol', 1, 1, NULL),
+('Guantes de Portero Future', 'Puma', 240000, 'Látex de alto agarre', 1, 1, NULL),
+('Camiseta Selección', 'Adidas', 150000, 'Edición especial', 1, 1, NULL),
+('Balón baloncesto', 'Spalding', 110000, 'Balón oficial NBA', 2, 2, NULL),
+('Tenis Lebron Witness', 'Nike', 480000, 'Amortiguación reactiva', 1, 2, NULL),
+('Malla porta balones', 'Spalding', 30000, 'Capacidad 10 balones', 2, 2, NULL),
+('Sudadera deportiva', 'Nike', 120000, 'Sudadera térmica', 1, 3, NULL),
+('Zapatillas Ultraboost Light', 'Adidas', 650000, 'Retorno de energía ligero', 2, 3, NULL),
+('Tenis Speedcross 6', 'Salomon', 590000, 'Ideal para trail running', 2, 3, NULL),
+('Joggers Sport Tech', 'Nike', 185000, 'Corte ajustado', 1, 3, NULL),
+('Cuerda para saltar', 'Everlast', 35000, 'Cuerda ajustable', 1, 4, NULL),
+('Pesas 5kg', 'BodyFit', 50000, 'Recubiertas', 2, 4, NULL),
+('Mancuernas 20kg', 'BodyFit', 150000, 'Set completo', 2, 4, NULL),
+('Colchoneta Yoga Pro', 'Everlast', 75000, 'Antideslizante 6mm', 1, 4, NULL),
+('Gafas de Natación Pro', 'Speedo', 95000, 'Antiempañante y UV', 2, 5, NULL),
+('Gorro de Natación Silicona', 'Speedo', 25000, 'Ajuste hidrodinámico', 1, 5, NULL),
+('Casco Ciclismo Ruta', 'Bell', 250000, 'Certificación seguridad', 2, 6, NULL),
+('Guantes Ciclismo Gel', 'Giant', 85000, 'Acolchado anti-vibración', 1, 6, NULL),
+('Casco Escalada', 'Black Diamond', 320000, 'Ultra ligero', 1, 7, NULL),
+('Cuerda Escalada 50m', 'Petzl', 850000, 'Resistencia alta', 2, 7, NULL),
+('Chaqueta Rompevientos', 'Adidas', 210000, 'Protección contra viento', 2, 8, NULL),
+('Leggings Lux High-Rise', 'Reebok', 140000, 'Tela absorción humedad', 1, 8, NULL),
+('Termo deportivo', 'Nike', 45000, 'Acero inoxidable', 2, 9, NULL),
+('Gorra deportiva', 'Puma', 40000, 'Ajustable', 2, 9, NULL),
+('Protector bucal', 'Everlast', 25000, 'Protección dental', 1, 10, NULL),
+('Rodilleras', 'Reebok', 60000, 'Soporte deportivo', 1, 10, NULL),
+('Elíptica doméstica', 'ProFit', 1800000, 'Equipo cardio', 1, 11, NULL),
+('Reloj Inteligente Sport', 'Garmin', 1200000, 'Monitoreo ritmo cardíaco', 2, 11, NULL),
+('Steps Aeróbicos', 'ProFit', 160000, 'Altura ajustable 3 niveles', 1, 12, NULL),
+('Rueda Abdominal Dual', 'BodyFit', 42000, 'Core reforzado', 2, 12, NULL),
+('Proteína Whey 2lb', 'Optimum', 190000, 'Proteína de suero pura', 1, 13, NULL),
+('Creatina Micronizada', 'Muscletech', 95000, 'Fuerza explosiva', 2, 13, NULL),
+('Banda de Frecuencia', 'Polar', 280000, 'Conectividad Bluetooth', 1, 14, NULL),
+('Toalla Microfibra', 'Jadda', 35000, 'Secado rápido', 1, 15, NULL),
+('Kit Boxeo Iniciación', 'Everlast', 350000, 'Pack completo', 1, 15, NULL),
+('Balón medicinal 5kg', 'Everlast', 120000, 'Entrenamiento funcional', 1, 4, NULL),
+('Camiseta Entrenamiento', 'Nike', 115000, 'Dri-FIT', 1, 8, NULL),
+('Shorts Tennis', 'Adidas', 95000, 'Movilidad lateral', 2, 3, NULL),
+('Polo Tennis', 'Fila', 110000, 'Protección UV', 2, 3, NULL),
+('Guantes Gimnasio', 'Everlast', 45000, 'Ventilación', 1, 4, NULL),
+('Bolsa Hidratación 2L', 'Salomon', 125000, 'Compatible running', 2, 3, NULL),
+('Muñequeras', 'Reebok', 25000, 'Algodón', 1, 10, NULL),
+('Balón basket oficial', 'Spalding', 150000, 'NBA', 2, 2, NULL);
 
+-- ==============================
+-- Tallas de productos y colores en stock
+-- ==============================
+
+CREATE TABLE PRODUCTO_VARIANTES (
+    ID_VARIANTE INT AUTO_INCREMENT PRIMARY KEY,
+    ID_PRODUCTO INT NOT NULL,
+    COLOR VARCHAR(50),
+    NOMBRE_ATRIBUTO VARCHAR(50),
+    ATRIBUTO VARCHAR(50),
+    STOCK INT,
+
+    FOREIGN KEY (ID_PRODUCTO)
+        REFERENCES PRODUCTOS(ID)
+        ON DELETE CASCADE
+);
+
+INSERT INTO PRODUCTO_VARIANTES
+(ID_PRODUCTO, COLOR, NOMBRE_ATRIBUTO, ATRIBUTO, STOCK)
+VALUES
+
+-- Guayos
+(1,'Blanco','Talla','40',8),
+(1,'Blanco','Talla','41',15),
+(1,'Blanco','Talla','42',25),
+(1,'Blanco','Talla','43',12),
+
+-- Balón Al Rihla
+(2,'Blanco/Multicolor','Tamaño','Talla 5',20),
+
+-- Espinilleras
+(3,'Negro','Talla','S',15),
+(3,'Negro','Talla','M',25),
+(3,'Negro','Talla','L',15),
+
+-- Guantes de portero
+(4,'Naranja','Talla','8',4),
+(4,'Naranja','Talla','9',10),
+(4,'Naranja','Talla','10',6),
+
+-- Camiseta selección
+(5,'Amarillo','Talla','S',8),
+(5,'Amarillo','Talla','M',15),
+(5,'Amarillo','Talla','L',30),
+(5,'Amarillo','Talla','XL',10),
+
+-- Balón basket
+(6,'Naranja','Tamaño','Talla 7',50),
+
+-- Tenis Lebron
+(7,'Negro','Talla','41',8),
+(7,'Negro','Talla','42',15),
+(7,'Rojo','Talla','41',5),
+(7,'Rojo','Talla','42',10),
+
+-- Malla porta balones
+(8,'Negro','Tamaño','Única',100),
+
+-- Sudadera
+(9,'Gris','Talla','S',15),
+(9,'Gris','Talla','M',25),
+(9,'Gris','Talla','L',60),
+(9,'Gris','Talla','XL',20),
+
+-- Ultraboost
+(10,'Gris','Talla','38',6),
+(10,'Gris','Talla','39',18),
+(10,'Gris','Talla','40',10),
+
+-- Speedcross
+(11,'Azul','Talla','42',7),
+(11,'Azul','Talla','43',14),
+(11,'Azul','Talla','44',5),
+
+-- Joggers
+(12,'Azul Oscuro','Talla','S',10),
+(12,'Azul Oscuro','Talla','M',30),
+(12,'Azul Oscuro','Talla','L',15),
+
+-- Cuerda para saltar
+(13,'Negro','Tamaño','Única',100),
+
+-- Pesas
+(14,'Gris','Peso','5kg',60),
+
+-- Mancuernas
+(15,'Negro','Peso','20kg',20),
+
+-- Colchoneta
+(16,'Morado','Tamaño','Única',40),
+
+-- Gafas natación
+(17,'Humo','Tamaño','Única',40),
+
+-- Gorro natación
+(18,'Azul','Tamaño','Única',100),
+
+-- Casco ciclismo
+(19,'Negro','Talla','S',5),
+(19,'Negro','Talla','M',15),
+(19,'Negro','Talla','L',8),
+
+-- Guantes ciclismo
+(20,'Rojo','Talla','M',10),
+(20,'Rojo','Talla','L',30),
+
+-- Casco escalada
+(21,'Naranja','Tamaño','Única',10),
+
+-- Cuerda escalada
+(22,'Azul','Longitud','50m',5),
+
+-- Chaqueta rompevientos
+(23,'Blanco','Talla','M',10),
+(23,'Blanco','Talla','L',20),
+(23,'Blanco','Talla','XL',25),
+
+-- Leggings
+(24,'Vino Tinto','Talla','S',28),
+(24,'Vino Tinto','Talla','M',15),
+(24,'Vino Tinto','Talla','L',8),
+
+-- Termo
+(25,'Rojo','Capacidad','1L',90),
+
+-- Gorra
+(26,'Blanco','Tamaño','Única',120),
+
+-- Protector bucal
+(27,'Transparente','Tamaño','Única',150),
+
+-- Rodilleras
+(28,'Negro','Talla','S',20),
+(28,'Negro','Talla','M',80),
+(28,'Negro','Talla','L',25),
+
+-- Elíptica
+(29,'Negro','Tamaño','Única',8),
+
+-- Garmin
+(30,'Negro','Tamaño','Única',5),
+
+-- Steps
+(31,'Gris','Altura','3 niveles',12),
+(31,'Negro','Altura','3 niveles',12),
+
+-- Rueda abdominal
+(32,'Negro','Modelo','Dual',20),
+(32,'Rojo','Modelo','Dual',25),
+
+-- Proteína
+(33,'Vainilla','Presentación','2lb',30),
+
+-- Creatina
+(34,'Sin sabor','Presentación','300g',50),
+
+-- Banda de frecuencia
+(35,'Negro','Conectividad','Bluetooth',12),
+
+-- Toalla
+(36,'Azul Rey','Tamaño','L',150),
+
+-- Kit boxeo
+(37,'Rojo','Peso','10oz',5),
+(37,'Rojo','Peso','12oz',10),
+(37,'Rojo','Peso','14oz',5),
+
+-- Balón medicinal
+(38,'Gris','Peso','5kg',20),
+
+-- Camiseta entrenamiento
+(39,'Verde Lima','Talla','S',45),
+(39,'Verde Lima','Talla','M',20),
+(39,'Verde Lima','Talla','L',15),
+
+-- Shorts Tennis
+(40,'Negro','Talla','S',15),
+(40,'Negro','Talla','M',40),
+(40,'Negro','Talla','L',20),
+
+-- Polo Tennis
+(41,'Blanco','Talla','M',8),
+(41,'Blanco','Talla','L',22),
+(41,'Blanco','Talla','XL',10),
+
+-- Guantes gimnasio
+(42,'Gris','Talla','M',25),
+(42,'Negro','Talla','L',40),
+
+-- Bolsa hidratación
+(43,'Azul','Capacidad','2L',20),
+
+-- Muñequeras
+(44,'Blanco','Tamaño','Única',200),
+
+-- Balón basket oficial
+(45,'Naranja','Tamaño','Talla 7',40);
+
+
+
+-- =====================================================
+-- IMÁGENES
+-- =====================================================
+
+CREATE TABLE PRODUCTO_IMAGENES (
+    ID_IMAGEN INT AUTO_INCREMENT PRIMARY KEY,
+    ID_PRODUCTO INT NOT NULL,
+    URL_IMAGEN VARCHAR(255) NOT NULL,
+    ORDEN INT DEFAULT 1, -- 1 = Principal, 2 = Segunda, etc.
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID) ON DELETE CASCADE
+);
+
+INSERT INTO PRODUCTO_IMAGENES (ID_PRODUCTO, URL_IMAGEN, ORDEN) VALUES
+-- Producto 1
+(1, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab', 1),
+(1, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff', 2),
+(1, 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e', 3),
+-- Producto 2
+(2, 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519', 1),
+(2, 'https://images.unsplash.com/photo-1517649763962-0c623066013b', 2),
+(2, 'https://images.unsplash.com/photo-1596462502278-27bfdc403348', 3),
+-- Producto 3
+(3, 'https://images.unsplash.com/photo-1517649763962-0c623066013b', 1),
+(3, 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb', 2),
+(3, 'https://images.unsplash.com/photo-1602143407151-7111542de6e8', 3),
+-- Producto 4
+(4, 'https://images.unsplash.com/photo-1519861531473-9200262188bf', 1),
+(4, 'https://images.unsplash.com/photo-1600180758895-1c1bdb0f9e7b', 2),
+(4, 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad', 3),
+-- Producto 5
+(5, 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e', 1),
+(5, 'https://images.unsplash.com/photo-1600180758890-6b94519a8ba5', 2),
+(5, 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61', 3),
+-- Producto 6
+(6, 'https://images.unsplash.com/photo-1596462502278-27bfdc403348', 1),
+(6, 'https://images.unsplash.com/photo-1594737625785-cb7f8c6c5b60', 2),
+(6, 'https://images.unsplash.com/photo-1599058917212-d750089bc07e', 3),
+-- Producto 7
+(7, 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb', 1),
+(7, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff', 2),
+(7, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e', 3),
+-- Producto 8
+(8, 'https://images.unsplash.com/photo-1602143407151-7111542de6e8', 1),
+(8, 'https://images.unsplash.com/photo-1574629810360-7efbbe195018', 2),
+(8, 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a', 3),
+-- Producto 9
+(9, 'https://images.unsplash.com/photo-1600180758895-1c1bdb0f9e7b', 1),
+(9, 'https://images.unsplash.com/photo-1628153322151-35a12d307991', 2),
+(9, 'https://images.unsplash.com/photo-1560769629-975ec94e6a86', 3),
+-- Producto 10
+(10, 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad', 1),
+(10, 'https://images.unsplash.com/photo-1511191988486-103bc3cb8002', 2),
+(10, 'https://images.unsplash.com/photo-1622279457486-62dcc4a497c4', 3),
+-- Producto 11
+(11, 'https://images.unsplash.com/photo-1600180758890-6b94519a8ba5', 1),
+(11, 'https://images.unsplash.com/photo-1517841905240-472988babdf9', 2),
+(11, 'https://images.unsplash.com/photo-1552066344-24632e2df2b3', 3),
+-- Producto 12
+(12, 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61', 1),
+(12, 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea', 2),
+(12, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c', 3),
+-- Producto 13
+(13, 'https://images.unsplash.com/photo-1594737625785-cb7f8c6c5b60', 1),
+(13, 'https://images.unsplash.com/photo-1510017803434-a899398421b3', 2),
+(13, 'https://images.unsplash.com/photo-1548330065-c24c62094473', 3),
+-- Producto 14
+(14, 'https://images.unsplash.com/photo-1599058917212-d750089bc07e', 1),
+(14, 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8', 2),
+(14, 'https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99', 3),
+-- Producto 15
+(15, 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb', 1),
+(15, 'https://images.unsplash.com/photo-1598289431512-b97b0917a63e', 2),
+(15, 'https://images.unsplash.com/photo-1592432678016-e910b452f9a2', 3),
+-- Producto 16
+(16, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff', 1),
+(16, 'https://images.unsplash.com/photo-1634484521128-4f1082260661', 2),
+(16, 'https://images.unsplash.com/photo-1523275335684-37898b6baf30', 3),
+-- Producto 17
+(17, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e', 1),
+(17, 'https://images.unsplash.com/photo-1544919982-b61976f0ba43', 2),
+(17, 'https://images.unsplash.com/photo-1606902960316-39f264e839ed', 3),
+-- Producto 18
+(18, 'https://images.unsplash.com/photo-1574629810360-7efbbe195018', 1),
+(18, 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48', 2),
+(18, 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b', 3),
+-- Producto 19
+(19, 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a', 1),
+(19, 'https://images.unsplash.com/photo-1518611012118-296032bb947a', 2),
+(19, 'https://images.unsplash.com/photo-1594458396597-073c65918314', 3),
+-- Producto 20
+(20, 'https://images.unsplash.com/photo-1628153322151-35a12d307991', 1),
+(20, 'https://images.unsplash.com/photo-1551830820-330a71b99659', 2),
+(20, 'https://images.unsplash.com/photo-1626015413325-0150215da7c2', 3),
+-- Producto 21
+(21, 'https://images.unsplash.com/photo-1560769629-975ec94e6a86', 1),
+(21, 'https://images.unsplash.com/photo-1606335543042-57c525922933', 2),
+(21, 'https://images.unsplash.com/photo-1519315901367-f34ff9154487', 3),
+-- Producto 22
+(22, 'https://images.unsplash.com/photo-1511191988486-103bc3cb8002', 1),
+(22, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab', 2),
+(22, 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519', 3),
+-- Producto 23
+(23, 'https://images.unsplash.com/photo-1622279457486-62dcc4a497c4', 1),
+(23, 'https://images.unsplash.com/photo-1517649763962-0c623066013b', 2),
+(23, 'https://images.unsplash.com/photo-1519861531473-9200262188bf', 3),
+-- Producto 24
+(24, 'https://images.unsplash.com/photo-1517841905240-472988babdf9', 1),
+(24, 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e', 2),
+(24, 'https://images.unsplash.com/photo-1596462502278-27bfdc403348', 3),
+-- Producto 25
+(25, 'https://images.unsplash.com/photo-1552066344-24632e2df2b3', 1),
+(25, 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb', 2),
+(25, 'https://images.unsplash.com/photo-1602143407151-7111542de6e8', 3),
+-- Producto 26
+(26, 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea', 1),
+(26, 'https://images.unsplash.com/photo-1600180758895-1c1bdb0f9e7b', 2),
+(26, 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad', 3),
+-- Producto 27
+(27, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c', 1),
+(27, 'https://images.unsplash.com/photo-1600180758890-6b94519a8ba5', 2),
+(27, 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61', 3),
+-- Producto 28
+(28, 'https://images.unsplash.com/photo-1510017803434-a899398421b3', 1),
+(28, 'https://images.unsplash.com/photo-1594737625785-cb7f8c6c5b60', 2),
+(28, 'https://images.unsplash.com/photo-1599058917212-d750089bc07e', 3),
+-- Producto 29
+(29, 'https://images.unsplash.com/photo-1548330065-c24c62094473', 1),
+(29, 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb', 2),
+(29, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff', 3),
+-- Producto 30
+(30, 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8', 1),
+(30, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e', 2),
+(30, 'https://images.unsplash.com/photo-1574629810360-7efbbe195018', 3),
+-- Producto 31
+(31, 'https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99', 1),
+(31, 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a', 2),
+(31, 'https://images.unsplash.com/photo-1628153322151-35a12d307991', 3),
+-- Producto 32
+(32, 'https://images.unsplash.com/photo-1598289431512-b97b0917a63e', 1),
+(32, 'https://images.unsplash.com/photo-1560769629-975ec94e6a86', 2),
+(32, 'https://images.unsplash.com/photo-1511191988486-103bc3cb8002', 3),
+-- Producto 33
+(33, 'https://images.unsplash.com/photo-1592432678016-e910b452f9a2', 1),
+(33, 'https://images.unsplash.com/photo-1622279457486-62dcc4a497c4', 2),
+(33, 'https://images.unsplash.com/photo-1517841905240-472988babdf9', 3),
+-- Producto 34
+(34, 'https://images.unsplash.com/photo-1634484521128-4f1082260661', 1),
+(34, 'https://images.unsplash.com/photo-1552066344-24632e2df2b3', 2),
+(34, 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea', 3),
+-- Producto 35
+(35, 'https://images.unsplash.com/photo-1523275335684-37898b6baf30', 1),
+(35, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c', 2),
+(35, 'https://images.unsplash.com/photo-1510017803434-a899398421b3', 3),
+-- Producto 36
+(36, 'https://images.unsplash.com/photo-1544919982-b61976f0ba43', 1),
+(36, 'https://images.unsplash.com/photo-1548330065-c24c62094473', 2),
+(36, 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8', 3),
+-- Producto 37
+(37, 'https://images.unsplash.com/photo-1606902960316-39f264e839ed', 1),
+(37, 'https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99', 2),
+(37, 'https://images.unsplash.com/photo-1598289431512-b97b0917a63e', 3),
+-- Producto 38
+(38, 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48', 1),
+(38, 'https://images.unsplash.com/photo-1592432678016-e910b452f9a2', 2),
+(38, 'https://images.unsplash.com/photo-1634484521128-4f1082260661', 3),
+-- Producto 39
+(39, 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b', 1),
+(39, 'https://images.unsplash.com/photo-1523275335684-37898b6baf30', 2),
+(39, 'https://images.unsplash.com/photo-1544919982-b61976f0ba43', 3),
+-- Producto 40
+(40, 'https://images.unsplash.com/photo-1518611012118-296032bb947a', 1),
+(40, 'https://images.unsplash.com/photo-1606902960316-39f264e839ed', 2),
+(40, 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48', 3),
+-- Producto 41
+(41, 'https://images.unsplash.com/photo-1594458396597-073c65918314', 1),
+(41, 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b', 2),
+(41, 'https://images.unsplash.com/photo-1518611012118-296032bb947a', 3),
+-- Producto 42
+(42, 'https://images.unsplash.com/photo-1551830820-330a71b99659', 1),
+(42, 'https://images.unsplash.com/photo-1594458396597-073c65918314', 2),
+(42, 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b', 3),
+-- Producto 43
+(43, 'https://images.unsplash.com/photo-1626015413325-0150215da7c2', 1),
+(43, 'https://images.unsplash.com/photo-1551830820-330a71b99659', 2),
+(43, 'https://images.unsplash.com/photo-1594458396597-073c65918314', 3),
+-- Producto 44
+(44, 'https://images.unsplash.com/photo-1606335543042-57c525922933', 1),
+(44, 'https://images.unsplash.com/photo-1626015413325-0150215da7c2', 2),
+(44, 'https://images.unsplash.com/photo-1551830820-330a71b99659', 3),
+-- Producto 45
+(45, 'https://images.unsplash.com/photo-1519315901367-f34ff9154487', 1),
+(45, 'https://images.unsplash.com/photo-1606335543042-57c525922933', 2),
+(45, 'https://images.unsplash.com/photo-1626015413325-0150215da7c2', 3);
 
 -- ==============================
 -- INVENTARIO
 -- ==============================
-
 CREATE TABLE INVENTARIO (
     ID_INVENTARIO INT PRIMARY KEY AUTO_INCREMENT,
     ID_PRODUCTO INT,
@@ -258,11 +660,9 @@ VALUES
 (14, 20, '2025-01-14', '2025-01-14'),
 (15, 55, '2025-01-15', '2025-01-15');
 
-
 -- ==============================
 -- EMPLEADOS
 -- ==============================
-
 CREATE TABLE EMPLEADOS (
     ID_EMPLEADO INT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE_EMPLEADO VARCHAR(100),
@@ -289,19 +689,16 @@ VALUES
 ('Sebastián', 'Moreno', 'Vendedor', '2022-03-17', '3034445566', 'sebastian@tienda.com'),
 ('Paula', 'Rojas', 'Cajero', '2024-01-09', '3035556677', 'paula@tienda.com');
 
-
 -- ==============================
 -- METODOS DE PAGO
 -- ==============================
-
 CREATE TABLE METODOS_PAGO (
     ID_METODO INT PRIMARY KEY AUTO_INCREMENT,
     NOMBRE_METODO VARCHAR(50) NOT NULL,
     DESCRIPCION VARCHAR(100)
 );
 
-INSERT INTO METODOS_PAGO (NOMBRE_METODO, DESCRIPCION)
-VALUES
+INSERT INTO METODOS_PAGO (NOMBRE_METODO, DESCRIPCION) VALUES
 ('Efectivo', 'Pago en dinero físico'),
 ('Tarjeta débito', 'Pago con tarjeta débito'),
 ('Tarjeta crédito', 'Pago con tarjeta crédito'),
@@ -318,19 +715,18 @@ VALUES
 ('QR Bancario', 'Pago por código QR'),
 ('Bitcoin', 'Pago con criptomoneda');
 
-
 -- ==============================
 -- VENTAS
 -- ==============================
-
 CREATE TABLE VENTAS (
     ID_VENTA INT PRIMARY KEY AUTO_INCREMENT,
     ID_CLIENTE INT,
-    ID_EMPLEADO INT,
+    ID_EMPLEADO INT NULL, -- Ajustado: Ahora puede ser NULL si se compra directo desde la web
     FECHA_VENTA DATETIME,
     TOTAL DECIMAL(10,2),
     ESTADO VARCHAR(50) DEFAULT 'COMPLETADA',
     ID_METODO INT,
+    REFERENCIA_PAGO VARCHAR(100) DEFAULT NULL, -- Agregado: Para el código de la pasarela
     FOREIGN KEY (ID_CLIENTE) REFERENCES CLIENTES(ID_CLIENTE),
     FOREIGN KEY (ID_EMPLEADO) REFERENCES EMPLEADOS(ID_EMPLEADO),
     FOREIGN KEY (ID_METODO) REFERENCES METODOS_PAGO(ID_METODO)
@@ -355,11 +751,9 @@ VALUES
 (14, 1, '2025-01-18 09:50:00', 110000.00, 'COMPLETADA', 6),
 (15, 2, '2025-01-19 14:35:00', 50000.00, 'COMPLETADA', 2);
 
-
 -- ==============================
 -- DETALLE VENTAS
 -- ==============================
-
 CREATE TABLE DETALLE_VENTAS (
     ID_DETALLE INT PRIMARY KEY AUTO_INCREMENT,
     ID_VENTA INT,
@@ -375,44 +769,28 @@ INSERT INTO DETALLE_VENTAS
 (ID_VENTA, ID_PRODUCTO, CANTIDAD, PRECIO_UNITARIO, SUBTOTAL)
 VALUES
 (1, 11, 1, 150000.00, 150000.00),
-
 (2, 3, 1, 220000.00, 220000.00),
 (2, 10, 1, 40000.00, 40000.00),
-
 (3, 6, 1, 95000.00, 95000.00),
-
 (4, 2, 1, 180000.00, 180000.00),
 (4, 8, 1, 45000.00, 45000.00),
-
 (5, 5, 1, 35000.00, 35000.00),
-
 (6, 1, 1, 120000.00, 120000.00),
 (6, 7, 1, 25000.00, 25000.00),
-
 (7, 8, 1, 45000.00, 45000.00),
-
 (8, 9, 1, 60000.00, 60000.00),
-
 (9, 10, 1, 40000.00, 40000.00),
-
 (10, 11, 1, 150000.00, 150000.00),
 (10, 1, 1, 120000.00, 120000.00),
-
 (11, 13, 1, 1800000.00, 1800000.00),
-
 (12, 14, 1, 150000.00, 150000.00),
-
 (13, 15, 1, 70000.00, 70000.00),
-
 (14, 4, 1, 110000.00, 110000.00),
-
 (15, 12, 1, 50000.00, 50000.00);
-
 
 -- ==============================
 -- ENVIOS
 -- ==============================
-
 CREATE TABLE ENVIOS (
     ID_ENVIO INT PRIMARY KEY AUTO_INCREMENT,
     ID_VENTA INT,
@@ -431,7 +809,6 @@ VALUES
 -- ==============================
 -- MOVIMIENTOS STOCK
 -- ==============================
-
 CREATE TABLE MOVIMIENTOS_STOCK (
     ID_MOVIMIENTO INT PRIMARY KEY AUTO_INCREMENT,
     ID_PRODUCTO INT,
@@ -450,7 +827,6 @@ VALUES
 -- ==============================
 -- FAVORITOS
 -- ==============================
-
 CREATE TABLE FAVORITOS (
     ID_FAVORITO INT PRIMARY KEY AUTO_INCREMENT,
     ID_USUARIO INT,
@@ -466,451 +842,69 @@ VALUES
 (1, 1, '2025-06-01'),
 (2, 2, '2025-06-02');
 
+-- ==============================
+-- CARRITO DE COMPRAS
+-- ==============================
+CREATE TABLE CARRITO (
+    ID_CARRITO INT PRIMARY KEY AUTO_INCREMENT,
+    ID_USUARIO INT NOT NULL,
+    ID_PRODUCTO INT NOT NULL,
+    CANTIDAD INT NOT NULL DEFAULT 1,
+    FECHA_AGREGADO TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO) ON DELETE CASCADE,
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID) ON DELETE CASCADE
+);
+
+-- ==============================
+-- RESEÑAS
+-- ==============================
+
+CREATE TABLE RESENAS (
+    ID_RESENA INT AUTO_INCREMENT PRIMARY KEY,
+    ID_PRODUCTO INT NOT NULL,
+    ID_USUARIO INT NOT NULL,
+    CALIFICACION INT CHECK (CALIFICACION BETWEEN 1 AND 5),
+    COMENTARIO TEXT,
+    FECHA TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID) ON DELETE CASCADE,
+    FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO) ON DELETE CASCADE
+);
+
+-- ==============================
+-- CARACTERISTICAS E INFORMACION DEL PRODUCTO
+-- ==============================
+CREATE TABLE PRODUCTO_CARACTERISTICAS (
+    ID_CARACTERISTICA INT AUTO_INCREMENT PRIMARY KEY,
+    ID_PRODUCTO INT NOT NULL,
+    NOMBRE_ATRIBUTO VARCHAR(100) NOT NULL, -- Ejemplo: "Material"
+    VALOR_ATRIBUTO VARCHAR(255) NOT NULL,  -- Ejemplo: "Algodón"
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID) ON DELETE CASCADE
+);
 
 
 
-
-
-
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab' WHERE ID = 1;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519' WHERE ID = 2;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1517649763962-0c623066013b' WHERE ID = 3;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1519861531473-9200262188bf' WHERE ID = 4;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e' WHERE ID = 5;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348' WHERE ID = 6;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb' WHERE ID = 7;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1602143407151-7111542de6e8' WHERE ID = 8;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1600180758895-1c1bdb0f9e7b' WHERE ID = 9;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad' WHERE ID = 10;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1600180758890-6b94519a8ba5' WHERE ID = 11;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61' WHERE ID = 12;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1594737625785-cb7f8c6c5b60' WHERE ID = 13;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1599058917212-d750089bc07e' WHERE ID = 14;
-UPDATE PRODUCTOS SET IMAGEN = 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb' WHERE ID = 15;
-
-
-select * from usuarios;
+select * from USUARIOS;
+select * from productos;
 DELETE FROM USUARIOS WHERE EMAIL = 'yeisiton922@gmail.com';
+DELETE FROM USUARIOS WHERE EMAIL = 'yeisonfernandez2022@gmail.com';
+DELETE FROM USUARIOS WHERE EMAIL = 'yeison2004@hotmail.es';
 
 
--- Vista de usuarios logueados 
-
-CREATE VIEW VISTA_USUARIOS_LOGUEADOS AS
+-- ----------------------------------------
+-- Join PARA FILTRAR CATEGORIA EN CATALOGO	
+-- -----------------------------------------
 SELECT 
-    ID_USUARIO,
-    NOMBRE_USUARIO,
-    APELLIDO_USUARIO,
-    EMAIL,
-    USUARIO,
-    FECHA_REGISTRO
-FROM USUARIOS
-WHERE CONFIRMADO = 1;
+  PRODUCTOS.ID,
+  PRODUCTOS.NOMBRE,
+  PRODUCTOS.PRECIO,
+  PI.URL_IMAGEN,
+  PI.ORDEN
+FROM PRODUCTOS
+LEFT JOIN PRODUCTO_IMAGENES PI ON PRODUCTOS.ID = PI.ID_PRODUCTO
+ORDER BY PRODUCTOS.ID, PI.ORDEN;
+
+
+SELECT * FROM CARRITO WHERE ID_USUARIO = 16;
+SHOW TABLES;
+select * from PRODUCTOS;
 
--- Vista de usuarios registrados 
-
-CREATE VIEW VISTA_USUARIOS_RECIENTES AS
-SELECT 
-    ID_USUARIO,
-    NOMBRE_USUARIO,
-    APELLIDO_USUARIO,
-    EMAIL,
-    USUARIO,
-    FECHA_REGISTRO
-FROM USUARIOS
-WHERE FECHA_REGISTRO >= CURDATE() - INTERVAL 20 DAY;
-
-
-
-
-
-
-
--- ==============================
--- FUNCIONES DE AGREGACIÓN (CONSULTAS)
--- ==============================
-
-SELECT COUNT(*) AS TOTAL_VENTAS FROM VENTAS; -- Cuenta el total de ventas registradas
-SELECT SUM(TOTAL) AS INGRESOS FROM VENTAS; -- Suma todos los ingresos de ventas
-SELECT AVG(TOTAL) AS PROMEDIO FROM VENTAS; -- Calcula el promedio de las ventas
-SELECT MAX(PRECIO) AS MAX_PRECIO FROM PRODUCTOS; -- Obtiene el precio más alto
-SELECT MIN(PRECIO) AS MIN_PRECIO FROM PRODUCTOS; -- Obtiene el precio más bajo
-
-SELECT ID_CLIENTE, SUM(TOTAL) TOTAL
-FROM VENTAS
-GROUP BY ID_CLIENTE; -- Total gastado por cada cliente
-
-SELECT ID_CLIENTE, SUM(TOTAL) TOTAL
-FROM VENTAS
-GROUP BY ID_CLIENTE
-HAVING TOTAL > 200000; -- Clientes que han gastado más de 200000
-
-
--- ==============================
--- PROCEDIMIENTOS ALMACENADOS
--- ==============================
-
-DELIMITER $$
-
--- SIN PARÁMETROS
-CREATE PROCEDURE sp_listar_productos()
-BEGIN SELECT * FROM PRODUCTOS; END $$ -- Lista todos los productos
-CALL sp_listar_productos();
-
-CREATE PROCEDURE sp_listar_clientes()
-BEGIN SELECT * FROM CLIENTES; END $$ -- Lista todos los clientes
-CALL sp_listar_clientes();
-
-CREATE PROCEDURE sp_listar_ventas()
-BEGIN SELECT * FROM VENTAS; END $$ -- Lista todas las ventas
-CALL sp_listar_ventas();
-
-CREATE PROCEDURE sp_listar_empleados()
-BEGIN SELECT * FROM EMPLEADOS; END $$ -- Lista todos los empleados
-CALL sp_listar_empleados();
-
-CREATE PROCEDURE sp_listar_proveedores()
-BEGIN SELECT * FROM PROVEEDORES; END $$ -- Lista todos los proveedores
-CALL sp_listar_proveedores();
-
-CREATE PROCEDURE sp_productos_stock()
-BEGIN SELECT * FROM PRODUCTOS WHERE STOCK > 0; END $$ -- Productos con stock disponible
-CALL sp_productos_stock();
-
-CREATE PROCEDURE sp_productos_sin_stock()
-BEGIN SELECT * FROM PRODUCTOS WHERE STOCK = 0; END $$ -- Productos sin stock
-CALL sp_productos_sin_stock();
-
-CREATE PROCEDURE sp_total_ingresos()
-BEGIN SELECT SUM(TOTAL) FROM VENTAS; END $$ -- Total de ingresos
-CALL sp_total_ingresos();
-
-CREATE PROCEDURE sp_top_clientes()
-BEGIN 
-SELECT ID_CLIENTE, SUM(TOTAL) TOTAL
-FROM VENTAS
-GROUP BY ID_CLIENTE
-ORDER BY TOTAL DESC;
-END $$ -- Clientes ordenados por mayor compra
-CALL sp_top_clientes();
-
-CREATE PROCEDURE sp_ventas_hoy()
-BEGIN SELECT * FROM VENTAS WHERE DATE(FECHA_VENTA)=CURDATE(); END $$ -- Ventas del día actual
-CALL sp_ventas_hoy();
-
-
--- PARÁMETRO SIMPLE IN 
-CREATE PROCEDURE sp_buscar_producto(IN nombre VARCHAR(100))
-BEGIN 
-SELECT * FROM PRODUCTOS WHERE NOMBRE LIKE CONCAT('%', nombre, '%'); 
-END $$ -- Busca productos por nombre
-CALL sp_buscar_producto('camisa');
-
-CREATE PROCEDURE sp_ventas_cliente(IN id INT)
-BEGIN SELECT * FROM VENTAS WHERE ID_CLIENTE = id; END $$ -- Ventas de un cliente
-CALL sp_ventas_cliente(1);
-
-CREATE PROCEDURE sp_productos_categoria(IN cat INT)
-BEGIN SELECT * FROM PRODUCTOS WHERE ID_CATEGORIA = cat; END $$ -- Productos por categoría
-CALL sp_productos_categoria(2);
-
-CREATE PROCEDURE sp_eliminar_producto(IN id INT)
-BEGIN DELETE FROM PRODUCTOS WHERE ID = id; END $$ -- Elimina un producto
-CALL sp_eliminar_producto(5);
-
-CREATE PROCEDURE sp_stock_producto(IN id INT)
-BEGIN SELECT STOCK FROM PRODUCTOS WHERE ID = id; END $$ -- Consulta stock de producto
-CALL sp_stock_producto(3);
-
--- DOBLE PARÁMETRO
-CREATE PROCEDURE sp_actualizar_precio(IN id INT, IN nuevo DECIMAL(10,2))
-BEGIN UPDATE PRODUCTOS SET PRECIO = nuevo WHERE ID = id; END $$ -- Actualiza precio
-CALL sp_actualizar_precio(1, 50000);
-
-CREATE PROCEDURE sp_ventas_rango(IN f1 DATE, IN f2 DATE)
-BEGIN SELECT * FROM VENTAS WHERE FECHA_VENTA BETWEEN f1 AND f2; END $$ -- Ventas entre fechas
-CALL sp_ventas_rango('2024-01-01', '2024-12-31');
-
-CREATE PROCEDURE sp_insertar_producto(IN nombre VARCHAR(100), IN precio DECIMAL(10,2))
-BEGIN INSERT INTO PRODUCTOS(NOMBRE, PRECIO) VALUES(nombre, precio); END $$ -- Inserta producto
-CALL sp_insertar_producto('Zapatos', 80000);
-
-CREATE PROCEDURE sp_actualizar_stock(IN id INT, IN cantidad INT)
-BEGIN UPDATE PRODUCTOS SET STOCK = cantidad WHERE ID = id; END $$ -- Actualiza stock
-CALL sp_actualizar_stock(1, 50);
-
-CREATE PROCEDURE sp_detalle_venta(IN venta INT, IN producto INT)
-BEGIN 
-SELECT * FROM DETALLE_VENTAS
-WHERE ID_VENTA = venta AND ID_PRODUCTO = producto;
-END $$ -- Detalle específico de venta
-CALL sp_detalle_venta(1, 2);
-
--- CON OUT
-CREATE PROCEDURE sp_total_ventas(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM VENTAS; END $$ -- Total de ventas
-SET @total = 0;
-CALL sp_total_ventas(@total);
-SELECT @total;
-
-CREATE PROCEDURE sp_ingresos(OUT total DECIMAL(10,2))
-BEGIN SELECT SUM(TOTAL) INTO total FROM VENTAS; END $$ -- Total ingresos
-SET @ingresos = 0;
-CALL sp_ingresos(@ingresos);
-SELECT @ingresos;
-
-CREATE PROCEDURE sp_stock_total(OUT total INT)
-BEGIN SELECT SUM(STOCK) INTO total FROM PRODUCTOS; END $$ -- Stock total
-SET @stock = 0;
-CALL sp_stock_total(@stock);
-SELECT @stock;
-
-CREATE PROCEDURE sp_clientes_total(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM CLIENTES; END $$ -- Total clientes
-SET @clientes = 0;
-CALL sp_clientes_total(@clientes);
-SELECT @clientes;
-
-CREATE PROCEDURE sp_productos_total(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM PRODUCTOS; END $$ -- Total productos
-SET @productos = 0;
-CALL sp_productos_total(@productos);
-SELECT @productos;
-
-CREATE PROCEDURE sp_precio_max(OUT maximo DECIMAL(10,2))
-BEGIN SELECT MAX(PRECIO) INTO maximo FROM PRODUCTOS; END $$ -- Precio máximo
-SET @max = 0;
-CALL sp_precio_max(@max);
-SELECT @max;
-
-CREATE PROCEDURE sp_precio_min(OUT minimo DECIMAL(10,2))
-BEGIN SELECT MIN(PRECIO) INTO minimo FROM PRODUCTOS; END $$ -- Precio mínimo
-SET @min = 0;
-CALL sp_precio_min(@min);
-SELECT @min;
-
-CREATE PROCEDURE sp_promedio_ventas(OUT promedio DECIMAL(10,2))
-BEGIN SELECT AVG(TOTAL) INTO promedio FROM VENTAS; END $$ -- Promedio ventas
-SET @prom = 0;
-CALL sp_promedio_ventas(@prom);
-SELECT @prom;
-
-CREATE PROCEDURE sp_ventas_completadas(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM VENTAS WHERE ESTADO='COMPLETADA'; END $$ -- Ventas completadas
-SET @ventas = 0;
-CALL sp_ventas_completadas(@ventas);
-SELECT @ventas;
-
-CREATE PROCEDURE sp_productos_stock_bajo(OUT total INT)
-BEGIN SELECT COUNT(*) INTO total FROM PRODUCTOS WHERE STOCK < 20; END $$ -- Stock bajo
-SET @bajo = 0;
-CALL sp_productos_stock_bajo(@bajo);
-SELECT @bajo;
-
--- INOUT
-CREATE PROCEDURE sp_aumentar_precio(INOUT precio DECIMAL(10,2))
-BEGIN SET precio = precio * 1.10; END $$ -- Aumenta precio 10%
-SET @precio = 10000;
-CALL sp_aumentar_precio(@precio);
-SELECT @precio;
-
-CREATE PROCEDURE sp_descuento(INOUT precio DECIMAL(10,2))
-BEGIN SET precio = precio * 0.90; END $$ -- Aplica descuento 10%
-SET @precio = 10000;
-CALL sp_descuento(@precio);
-SELECT @precio;
-
-CREATE PROCEDURE sp_sumar_stock(INOUT stock INT)
-BEGIN SET stock = stock + 10; END $$ -- Suma 10 al stock
-SET @stock = 20;
-CALL sp_sumar_stock(@stock);
-SELECT @stock;
-
-CREATE PROCEDURE sp_restar_stock(INOUT stock INT)
-BEGIN SET stock = stock - 5; END $$ -- Resta 5 al stock
-SET @stock = 20;
-CALL sp_restar_stock(@stock);
-SELECT @stock;
-
-CREATE PROCEDURE sp_impuesto(INOUT precio DECIMAL(10,2))
-BEGIN SET precio = precio * 1.19; END $$ -- Aplica IVA 19%
-SET @precio = 10000;
-CALL sp_impuesto(@precio);
-SELECT @precio;
-
-DELIMITER ;
-
-
--- ==============================
--- VISTAS
--- ==============================
-
-CREATE VIEW vista_ventas_clientes AS
-SELECT c.NOMBRE_CLIENTE, v.TOTAL
-FROM CLIENTES c
-JOIN VENTAS v ON c.ID_CLIENTE = v.ID_CLIENTE; -- Relaciona clientes con sus compras
-SELECT * FROM vista_ventas_clientes;
-
-CREATE VIEW vista_productos_categoria AS
-SELECT p.NOMBRE, c.NOMBRE_CATEGORIA
-FROM PRODUCTOS p
-JOIN CATEGORIAS c ON p.ID_CATEGORIA = c.ID_CATEGORIA; -- Productos con categoría
-SELECT * FROM vista_productos_categoria;
-
-CREATE VIEW vista_stock AS
-SELECT NOMBRE, STOCK FROM PRODUCTOS; -- Muestra stock de productos
-SELECT * FROM vista_stock;
-
-CREATE VIEW vista_top_clientes AS
-SELECT ID_CLIENTE, SUM(TOTAL) TOTAL
-FROM VENTAS
-GROUP BY ID_CLIENTE; -- Total comprado por cliente
-SELECT * FROM vista_top_clientes;
-
-CREATE VIEW vista_empleados_ventas AS
-SELECT e.NOMBRE_EMPLEADO, COUNT(v.ID_VENTA) VENTAS
-FROM EMPLEADOS e
-JOIN VENTAS v ON e.ID_EMPLEADO = v.ID_EMPLEADO
-GROUP BY e.ID_EMPLEADO; -- Ventas por empleado
-SELECT * FROM vista_empleados_ventas;
-
-CREATE VIEW vista_productos_caros AS
-SELECT * FROM PRODUCTOS WHERE PRECIO > 100000; -- Productos caros
-SELECT * FROM vista_productos_caros;
-
-CREATE VIEW vista_productos_baratos AS
-SELECT * FROM PRODUCTOS WHERE PRECIO < 50000; -- Productos baratos
-SELECT * FROM vista_productos_baratos;
-
-CREATE VIEW vista_inventario AS
-SELECT p.NOMBRE, i.CANTIDAD
-FROM INVENTARIO i
-JOIN PRODUCTOS p ON p.ID = i.ID_PRODUCTO; -- Inventario con productos
-SELECT * FROM vista_inventario;
-
-CREATE VIEW vista_ventas_hoy AS
-SELECT * FROM VENTAS WHERE DATE(FECHA_VENTA)=CURDATE(); -- Ventas del día
-SELECT * FROM vista_ventas_hoy;
-
-CREATE VIEW vista_descuentos AS
-SELECT p.NOMBRE, d.PORCENTAJE
-FROM PRODUCTOS p
-JOIN DESCUENTOS d ON p.ID_DESCUENTO = d.ID_DESCUENTO; -- Productos con descuento
-SELECT * FROM vista_descuentos;
-
--- ==============================
--- TRIGGERS
--- ==============================
-
-DELIMITER $$
-
-CREATE TRIGGER tr_reducir_stock
-AFTER INSERT ON DETALLE_VENTAS
-FOR EACH ROW
-BEGIN
-UPDATE PRODUCTOS SET STOCK = STOCK - NEW.CANTIDAD
-WHERE ID = NEW.ID_PRODUCTO;
-END $$ -- Reduce stock al vender
-
-CREATE TRIGGER tr_no_stock_negativo
-BEFORE UPDATE ON PRODUCTOS
-FOR EACH ROW
-BEGIN
-IF NEW.STOCK < 0 THEN SET NEW.STOCK = 0; END IF;
-END $$ -- Evita stock negativo
-
-CREATE TRIGGER tr_fecha_usuario
-BEFORE INSERT ON USUARIOS
-FOR EACH ROW
-BEGIN
-SET NEW.FECHA_REGISTRO = CURDATE();
-END $$ -- Fecha automática usuario
-
-CREATE TRIGGER tr_precio
-BEFORE INSERT ON PRODUCTOS
-FOR EACH ROW
-BEGIN
-IF NEW.PRECIO <= 0 THEN SET NEW.PRECIO = 1000; END IF;
-END $$ -- Precio mínimo permitido
-
-CREATE TRIGGER tr_estado
-BEFORE INSERT ON VENTAS
-FOR EACH ROW
-BEGIN
-SET NEW.ESTADO = 'COMPLETADA';
-END $$ -- Estado automático venta
-
-CREATE TRIGGER tr_aumentar_stock
-AFTER INSERT ON INVENTARIO
-FOR EACH ROW
-BEGIN
-UPDATE PRODUCTOS SET STOCK = STOCK + NEW.CANTIDAD
-WHERE ID = NEW.ID_PRODUCTO;
-END $$ -- Aumenta stock
-
-CREATE TRIGGER tr_no_delete_cliente
-BEFORE DELETE ON CLIENTES
-FOR EACH ROW
-BEGIN
-SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='No eliminar clientes';
-END $$ -- Bloquea eliminar clientes
-
-CREATE TRIGGER tr_log_delete_producto
-AFTER DELETE ON PRODUCTOS
-FOR EACH ROW
-BEGIN
-INSERT INTO MOVIMIENTOS_STOCK(ID_PRODUCTO,TIPO_MOVIMIENTO,CANTIDAD,FECHA)
-VALUES(OLD.ID,'ELIMINADO',0,CURDATE());
-END $$ -- Registra eliminación producto
-
-CREATE TRIGGER tr_email
-BEFORE INSERT ON USUARIOS
-FOR EACH ROW
-BEGIN
-IF NEW.EMAIL NOT LIKE '%@%' THEN SET NEW.EMAIL='correo@default.com'; END IF;
-END $$ -- Corrige email inválido
-
-CREATE TRIGGER tr_update_inventario
-BEFORE UPDATE ON INVENTARIO
-FOR EACH ROW
-BEGIN
-SET NEW.FECHA_ACTUALIZACION = CURDATE();
-END $$ -- Actualiza fecha inventario
-
-CREATE TRIGGER tr_log_venta
-AFTER INSERT ON VENTAS
-FOR EACH ROW
-BEGIN
-INSERT INTO MOVIMIENTOS_STOCK(ID_PRODUCTO,TIPO_MOVIMIENTO,CANTIDAD,FECHA)
-VALUES(1,'VENTA',1,CURDATE());
-END $$ -- Registro de venta
-
-CREATE TRIGGER tr_cantidad
-BEFORE INSERT ON DETALLE_VENTAS
-FOR EACH ROW
-BEGIN
-IF NEW.CANTIDAD <= 0 THEN SET NEW.CANTIDAD = 1; END IF;
-END $$ -- Evita cantidad inválida
-
-CREATE TRIGGER tr_update_precio
-BEFORE UPDATE ON PRODUCTOS
-FOR EACH ROW
-BEGIN
-IF NEW.PRECIO < 1000 THEN SET NEW.PRECIO = 1000; END IF;
-END $$ -- Precio mínimo al actualizar
-
-CREATE TRIGGER tr_cliente_user
-AFTER INSERT ON USUARIOS
-FOR EACH ROW
-BEGIN
-INSERT INTO CLIENTES(NOMBRE_CLIENTE,APELLIDO_CLIENTE,TIPODO_CLIENTE,DOCUMENTO_CLIENTE,ID_USUARIO)
-VALUES(NEW.NOMBRE_USUARIO,NEW.APELLIDO_USUARIO,'CC',UUID(),NEW.ID_USUARIO);
-END $$ -- Crea cliente automático
-
-CREATE TRIGGER tr_no_delete_venta
-BEFORE DELETE ON VENTAS
-FOR EACH ROW
-BEGIN
-SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='No eliminar ventas';
-END $$ -- Bloquea eliminar ventas
-
-DELIMITER ;
