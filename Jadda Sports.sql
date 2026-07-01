@@ -13,17 +13,11 @@ CREATE TABLE ROLES (
 
 INSERT INTO ROLES (NOMBRE_ROL, DESCRIPCION) VALUES
 ('Administrador', 'Control total del sistema'),
-('Cliente', 'Usuario que compra productos'),
 ('Empleado', 'Trabajador de la tienda'),
 ('Proveedor', 'Suministra productos'),
-('Bodeguero', 'Encargado del inventario'),
-('Contador', 'Gestión financiera'),
-('Soporte', 'Atención técnica'),
-('Gerente', 'Supervisa operaciones'),
-('Vendedor', 'Realiza ventas'),
-('Logística', 'Gestiona envíos'),
-('Marketing', 'Publicidad y promociones'),
-('Invitado', 'Acceso limitado');
+('Usuario', 'Persona registrada'),
+('Invitado', 'Persona no registrada');
+
 
 -- ==============================
 -- USUARIOS
@@ -35,9 +29,10 @@ CREATE TABLE USUARIOS (
     EMAIL VARCHAR(100) UNIQUE NOT NULL,
     USUARIO VARCHAR(100) UNIQUE NOT NULL,
     telefono VARCHAR(255),
-    direccion VARCHAR(255),
     CONTRASENA VARCHAR(255) NOT NULL,
     FECHA_REGISTRO DATE,
+    TIPO_DOCUMENTO VARCHAR(5),
+    NUMERO_DOCUMENTO VARCHAR(20),
     ID_ROL INT,
     CONFIRMADO TINYINT DEFAULT 0,          
     TOKEN VARCHAR(6) DEFAULT NULL,        
@@ -48,58 +43,21 @@ CREATE TABLE USUARIOS (
     FOREIGN KEY (ID_ROL) REFERENCES ROLES(ID_ROL)
 );
 
-INSERT INTO USUARIOS 
-(ID_USUARIO, NOMBRE_USUARIO, APELLIDO_USUARIO, EMAIL, USUARIO, CONTRASENA, FECHA_REGISTRO, ID_ROL, CONFIRMADO)
-VALUES
-(1, 'Juan', 'Torres', 'juan.torres@mail.com', 'juan.torres', 'clave123', '2024-01-12', 2, 1),
-(2, 'Daniela', 'Ríos', 'daniela.rios@mail.com', 'daniela.rios', 'clave123', '2023-08-05', 2, 1),
-(3, 'Felipe', 'Cano', 'felipe.cano@mail.com', 'felipe.cano', 'clave123', '2024-05-19', 2, 1),
-(4, 'Valeria', 'Mendoza', 'valeria.mendoza@mail.com', 'valeria.mendoza', 'clave123', '2025-02-02', 2, 1),
-(5, 'Santiago', 'Pardo', 'santiago.pardo@mail.com', 'santiago.pardo', 'clave123', '2023-11-22', 2, 1),
-(6, 'Manuela', 'Gil', 'manuela.gil@mail.com', 'manuela.gil', 'clave123', '2024-06-01', 2, 1),
-(7, 'Cristian', 'Navarro', 'cristian.navarro@mail.com', 'cristian.navarro', 'clave123', '2025-01-15', 2, 1),
-(8, 'Laura', 'Bautista', 'laura.bautista@mail.com', 'laura.bautista', 'clave123', '2024-09-09', 2, 1),
-(9, 'Kevin', 'Acosta', 'kevin.acosta@mail.com', 'kevin.acosta', 'clave123', '2023-12-12', 2, 1),
-(10, 'Sara', 'Quintero', 'sara.quintero@mail.com', 'sara.quintero', 'clave123', '2024-07-07', 2, 1),
-(11, 'Miguel', 'Lara', 'miguel.lara@mail.com', 'miguel.lara', 'clave123', '2024-03-18', 2, 1),
-(12, 'Paola', 'Vega', 'paola.vega@mail.com', 'paola.vega', 'clave123', '2023-10-10', 2, 1),
-(13, 'Andrés', 'Ruiz', 'andres.ruiz@mail.com', 'andres.ruiz', 'clave123', '2024-04-04', 2, 1),
-(14, 'Tatiana', 'Ocampo', 'tatiana.ocampo@mail.com', 'tatiana.ocampo', 'clave123', '2024-02-20', 2, 1),
-(15, 'Julian', 'Soto', 'julian.soto@mail.com', 'julian.soto', 'clave123', '2025-03-01', 2, 1);
 
--- ==============================
--- CLIENTES
--- ==============================
-CREATE TABLE CLIENTES (
-    ID_CLIENTE INT PRIMARY KEY AUTO_INCREMENT,
-    NOMBRE_CLIENTE VARCHAR(200) NOT NULL,
-    APELLIDO_CLIENTE VARCHAR(200) NOT NULL,
-    TIPODO_CLIENTE VARCHAR(2) NOT NULL,
-    DOCUMENTO_CLIENTE VARCHAR(20) UNIQUE NOT NULL,
-    DIRECCION_CLIENTE VARCHAR(100),
-    TELEFONO_CLIENTE VARCHAR(15),
-    ID_USUARIO INT NOT NULL,
-    FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO)
+CREATE TABLE DIRECCIONES (
+  ID_DIRECCION INT AUTO_INCREMENT PRIMARY KEY,
+  ID_USUARIO INT NOT NULL,
+  DIRECCION VARCHAR(255) NOT NULL,
+  BARRIO VARCHAR(100),
+  CIUDAD VARCHAR(100) NOT NULL,
+  DEPARTAMENTO VARCHAR(100) NOT NULL,
+  CODIGO_POSTAL VARCHAR(20),
+  TELEFONO_CONTACTO VARCHAR(20),
+  ETIQUETA VARCHAR(50) DEFAULT NULL,
+  ES_PRINCIPAL TINYINT(1) DEFAULT 0,
+  FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO)
 );
 
-INSERT INTO CLIENTES
-(NOMBRE_CLIENTE, APELLIDO_CLIENTE, TIPODO_CLIENTE, DOCUMENTO_CLIENTE, DIRECCION_CLIENTE, TELEFONO_CLIENTE, ID_USUARIO)
-VALUES
-('Juan', 'Torres', 'CC', '1200000001', 'Calle 10 #22-30', '3001112233', 1),
-('Daniela', 'Ríos', 'CC', '1200000002', 'Cra 45 #12-10', '3002223344', 2),
-('Felipe', 'Cano', 'TI', '1200000003', 'Av 30 #15-20', '3003334455', 3),
-('Valeria', 'Mendoza', 'CC', '1200000004', 'Calle 70 #8-90', '3004445566', 4),
-('Santiago', 'Pardo', 'CE', '1200000005', 'Cra 9 #3-21', '3005556677', 5),
-('Manuela', 'Gil', 'CC', '1200000006', 'Calle 19 #45-87', '3006667788', 6),
-('Cristian', 'Navarro', 'TI', '1200000007', 'Cra 15 #16-17', '3007778899', 7),
-('Laura', 'Bautista', 'CC', '1200000008', 'Av 68 #50-60', '3008889900', 8),
-('Kevin', 'Acosta', 'CC', '1200000009', 'Calle 5 #90-12', '3011112233', 9),
-('Sara', 'Quintero', 'CE', '1200000010', 'Cra 11 #44-55', '3012223344', 10),
-('Miguel', 'Lara', 'CC', '1200000011', 'Calle 8 #32-14', '3013334455', 11),
-('Paola', 'Vega', 'CC', '1200000012', 'Cra 7 #88-10', '3014445566', 12),
-('Andrés', 'Ruiz', 'TI', '1200000013', 'Calle 14 #12-90', '3015556677', 13),
-('Tatiana', 'Ocampo', 'CC', '1200000014', 'Cra 20 #45-19', '3016667788', 14),
-('Julian', 'Soto', 'CC', '1200000015', 'Calle 90 #12-30', '3017778899', 15);
 
 -- ==============================
 -- PROVEEDORES
@@ -171,7 +129,8 @@ CREATE TABLE DESCUENTOS (
 );
 
 INSERT INTO DESCUENTOS (DESCRIPCION, PORCENTAJE, FECHA_INICIO, FECHA_FIN) VALUES
-('Descuento temporada fútbol', 10, '2025-06-01', '2025-07-01');
+('Descuento temporada fútbol', 10, '2025-06-01', '2025-07-01'),
+('JADDA10', 10, '2025-01-01', '2026-12-31');
 
 -- ==============================
 -- PRODUCTOS
@@ -235,6 +194,18 @@ VALUES
 ('Muñequeras', 'Reebok', 25000, 'Algodón', 1, 10, NULL),
 ('Balón basket oficial', 'Spalding', 150000, 'NBA', 2, 2, NULL);
 
+REPLACE INTO PRODUCTOS (ID, NOMBRE, MARCA, PRECIO, DESCRIPCION, ID_PROVEEDOR, ID_CATEGORIA, ID_DESCUENTO) VALUES
+(1, 'Guayos profesionales', 'Adidas', 220000, 'Guayos para césped natural', 1, 1, 2),
+(10, 'Zapatillas Ultraboost Light', 'Adidas', 650000, 'Retorno de energía ligero', 2, 3, 2),
+(15, 'Mancuernas 20kg', 'BodyFit', 150000, 'Set completo', 2, 4, 2),
+(21, 'Casco Escalada', 'Black Diamond', 320000, 'Ultra ligero', 1, 7, 2),
+(29, 'Elíptica doméstica', 'ProFit', 1800000, 'Equipo cardio', 1, 11, 2),
+(34, 'Creatina Micronizada', 'Muscletech', 95000, 'Fuerza explosiva', 2, 13, 2),
+(37, 'Kit Boxeo Iniciación', 'Everlast', 350000, 'Pack completo', 1, 15, 2),
+(45, 'Balón basket oficial', 'Spalding', 150000, 'NBA', 2, 2, 2);
+
+
+
 -- ==============================
 -- Tallas de productos y colores en stock
 -- ==============================
@@ -246,7 +217,6 @@ CREATE TABLE PRODUCTO_VARIANTES (
     NOMBRE_ATRIBUTO VARCHAR(50),
     ATRIBUTO VARCHAR(50),
     STOCK INT,
-
     FOREIGN KEY (ID_PRODUCTO)
         REFERENCES PRODUCTOS(ID)
         ON DELETE CASCADE
@@ -256,181 +226,346 @@ INSERT INTO PRODUCTO_VARIANTES
 (ID_PRODUCTO, COLOR, NOMBRE_ATRIBUTO, ATRIBUTO, STOCK)
 VALUES
 
--- Guayos
-(1,'Blanco','Talla','40',8),
-(1,'Blanco','Talla','41',15),
-(1,'Blanco','Talla','42',25),
-(1,'Blanco','Talla','43',12),
+-- ==================== PRODUCTO 1: Guayos Profesionales ====================
+(1,'Blanco','Talla','39',6),
+(1,'Blanco','Talla','40',12),
+(1,'Blanco','Talla','41',18),
+(1,'Blanco','Talla','42',22),
+(1,'Blanco','Talla','43',10),
+(1,'Negro','Talla','39',5),
+(1,'Negro','Talla','40',10),
+(1,'Negro','Talla','41',15),
+(1,'Negro','Talla','42',20),
+(1,'Negro','Talla','43',8),
+(1,'Rojo','Talla','39',4),
+(1,'Rojo','Talla','40',8),
+(1,'Rojo','Talla','41',12),
+(1,'Rojo','Talla','42',15),
+(1,'Rojo','Talla','43',6),
 
--- Balón Al Rihla
+-- ==================== PRODUCTO 2: Balón Al Rihla Pro ====================
 (2,'Blanco/Multicolor','Tamaño','Talla 5',20),
 
--- Espinilleras
-(3,'Negro','Talla','S',15),
-(3,'Negro','Talla','M',25),
-(3,'Negro','Talla','L',15),
+-- ==================== PRODUCTO 3: Espinilleras ====================
+(3,'Negro','Talla','S',20),
+(3,'Negro','Talla','M',30),
+(3,'Negro','Talla','L',18),
+(3,'Blanco','Talla','S',15),
+(3,'Blanco','Talla','M',25),
+(3,'Blanco','Talla','L',12),
 
--- Guantes de portero
-(4,'Naranja','Talla','8',4),
-(4,'Naranja','Talla','9',10),
-(4,'Naranja','Talla','10',6),
+-- ==================== PRODUCTO 4: Guantes Portero Future ====================
+(4,'Naranja','Talla','7',3),
+(4,'Naranja','Talla','8',6),
+(4,'Naranja','Talla','9',12),
+(4,'Naranja','Talla','10',8),
+(4,'Naranja','Talla','11',4),
+(4,'Negro','Talla','7',4),
+(4,'Negro','Talla','8',8),
+(4,'Negro','Talla','9',14),
+(4,'Negro','Talla','10',10),
+(4,'Negro','Talla','11',5),
+(4,'Rojo','Talla','7',2),
+(4,'Rojo','Talla','8',5),
+(4,'Rojo','Talla','9',10),
+(4,'Rojo','Talla','10',7),
+(4,'Rojo','Talla','11',3),
 
--- Camiseta selección
-(5,'Amarillo','Talla','S',8),
-(5,'Amarillo','Talla','M',15),
-(5,'Amarillo','Talla','L',30),
-(5,'Amarillo','Talla','XL',10),
+-- ==================== PRODUCTO 5: Camiseta Selección ====================
+(5,'Amarillo','Talla','S',12),
+(5,'Amarillo','Talla','M',20),
+(5,'Amarillo','Talla','L',35),
+(5,'Amarillo','Talla','XL',14),
+(5,'Blanco','Talla','S',10),
+(5,'Blanco','Talla','M',18),
+(5,'Blanco','Talla','L',28),
+(5,'Blanco','Talla','XL',12),
+(5,'Negro','Talla','S',8),
+(5,'Negro','Talla','M',15),
+(5,'Negro','Talla','L',25),
+(5,'Negro','Talla','XL',10),
+(5,'Rojo','Talla','S',9),
+(5,'Rojo','Talla','M',16),
+(5,'Rojo','Talla','L',30),
+(5,'Rojo','Talla','XL',11),
 
--- Balón basket
+-- ==================== PRODUCTO 6: Balón baloncesto ====================
 (6,'Naranja','Tamaño','Talla 7',50),
 
--- Tenis Lebron
-(7,'Negro','Talla','41',8),
-(7,'Negro','Talla','42',15),
-(7,'Rojo','Talla','41',5),
-(7,'Rojo','Talla','42',10),
+-- ==================== PRODUCTO 7: Tenis Lebron Witness ====================
+(7,'Negro','Talla','40',4),
+(7,'Negro','Talla','41',10),
+(7,'Negro','Talla','42',18),
+(7,'Negro','Talla','43',6),
+(7,'Rojo','Talla','40',3),
+(7,'Rojo','Talla','41',8),
+(7,'Rojo','Talla','42',14),
+(7,'Rojo','Talla','43',5),
+(7,'Blanco','Talla','40',5),
+(7,'Blanco','Talla','41',12),
+(7,'Blanco','Talla','42',20),
+(7,'Blanco','Talla','43',8),
+(7,'Azul','Talla','40',4),
+(7,'Azul','Talla','41',9),
+(7,'Azul','Talla','42',16),
+(7,'Azul','Talla','43',6),
 
--- Malla porta balones
+-- ==================== PRODUCTO 8: Malla porta balones ====================
 (8,'Negro','Tamaño','Única',100),
 
--- Sudadera
-(9,'Gris','Talla','S',15),
-(9,'Gris','Talla','M',25),
-(9,'Gris','Talla','L',60),
-(9,'Gris','Talla','XL',20),
+-- ==================== PRODUCTO 9: Sudadera deportiva ====================
+(9,'Gris','Talla','S',18),
+(9,'Gris','Talla','M',28),
+(9,'Gris','Talla','L',50),
+(9,'Gris','Talla','XL',22),
+(9,'Negro','Talla','S',15),
+(9,'Negro','Talla','M',25),
+(9,'Negro','Talla','L',40),
+(9,'Negro','Talla','XL',18),
+(9,'Azul','Talla','S',12),
+(9,'Azul','Talla','M',22),
+(9,'Azul','Talla','L',35),
+(9,'Azul','Talla','XL',16),
 
--- Ultraboost
-(10,'Gris','Talla','38',6),
-(10,'Gris','Talla','39',18),
-(10,'Gris','Talla','40',10),
+-- ==================== PRODUCTO 10: Ultraboost Light ====================
+(10,'Gris','Talla','38',5),
+(10,'Gris','Talla','39',20),
+(10,'Gris','Talla','40',12),
+(10,'Gris','Talla','41',8),
+(10,'Gris','Talla','42',6),
+(10,'Negro','Talla','38',6),
+(10,'Negro','Talla','39',18),
+(10,'Negro','Talla','40',15),
+(10,'Negro','Talla','41',10),
+(10,'Negro','Talla','42',8),
+(10,'Blanco','Talla','38',7),
+(10,'Blanco','Talla','39',22),
+(10,'Blanco','Talla','40',14),
+(10,'Blanco','Talla','41',9),
+(10,'Blanco','Talla','42',7),
 
--- Speedcross
-(11,'Azul','Talla','42',7),
-(11,'Azul','Talla','43',14),
-(11,'Azul','Talla','44',5),
+-- ==================== PRODUCTO 11: Speedcross 6 ====================
+(11,'Azul','Talla','40',5),
+(11,'Azul','Talla','41',9),
+(11,'Azul','Talla','42',12),
+(11,'Azul','Talla','43',8),
+(11,'Azul','Talla','44',4),
+(11,'Negro','Talla','40',6),
+(11,'Negro','Talla','41',10),
+(11,'Negro','Talla','42',15),
+(11,'Negro','Talla','43',10),
+(11,'Negro','Talla','44',5),
+(11,'Rojo','Talla','40',4),
+(11,'Rojo','Talla','41',7),
+(11,'Rojo','Talla','42',10),
+(11,'Rojo','Talla','43',6),
+(11,'Rojo','Talla','44',3),
 
--- Joggers
-(12,'Azul Oscuro','Talla','S',10),
-(12,'Azul Oscuro','Talla','M',30),
-(12,'Azul Oscuro','Talla','L',15),
+-- ==================== PRODUCTO 12: Joggers Sport Tech ====================
+(12,'Azul Oscuro','Talla','S',14),
+(12,'Azul Oscuro','Talla','M',35),
+(12,'Azul Oscuro','Talla','L',20),
+(12,'Azul Oscuro','Talla','XL',10),
+(12,'Negro','Talla','S',12),
+(12,'Negro','Talla','M',28),
+(12,'Negro','Talla','L',18),
+(12,'Negro','Talla','XL',8),
+(12,'Gris','Talla','S',10),
+(12,'Gris','Talla','M',25),
+(12,'Gris','Talla','L',15),
+(12,'Gris','Talla','XL',7),
 
--- Cuerda para saltar
+-- ==================== PRODUCTO 13: Cuerda para saltar ====================
 (13,'Negro','Tamaño','Única',100),
 
--- Pesas
+-- ==================== PRODUCTO 14: Pesas 5kg ====================
 (14,'Gris','Peso','5kg',60),
 
--- Mancuernas
+-- ==================== PRODUCTO 15: Mancuernas 20kg ====================
 (15,'Negro','Peso','20kg',20),
 
--- Colchoneta
+-- ==================== PRODUCTO 16: Colchoneta Yoga Pro ====================
 (16,'Morado','Tamaño','Única',40),
 
--- Gafas natación
+-- ==================== PRODUCTO 17: Gafas Natación Pro ====================
 (17,'Humo','Tamaño','Única',40),
 
--- Gorro natación
+-- ==================== PRODUCTO 18: Gorro Natación Silicona ====================
 (18,'Azul','Tamaño','Única',100),
 
--- Casco ciclismo
-(19,'Negro','Talla','S',5),
-(19,'Negro','Talla','M',15),
-(19,'Negro','Talla','L',8),
+-- ==================== PRODUCTO 19: Casco Ciclismo Ruta ====================
+(19,'Negro','Talla','S',6),
+(19,'Negro','Talla','M',18),
+(19,'Negro','Talla','L',10),
+(19,'Rojo','Talla','S',4),
+(19,'Rojo','Talla','M',12),
+(19,'Rojo','Talla','L',8),
+(19,'Azul','Talla','S',5),
+(19,'Azul','Talla','M',14),
+(19,'Azul','Talla','L',9),
 
--- Guantes ciclismo
-(20,'Rojo','Talla','M',10),
-(20,'Rojo','Talla','L',30),
+-- ==================== PRODUCTO 20: Guantes Ciclismo Gel ====================
+(20,'Rojo','Talla','M',12),
+(20,'Rojo','Talla','L',35),
+(20,'Rojo','Talla','XL',8),
+(20,'Negro','Talla','M',15),
+(20,'Negro','Talla','L',40),
+(20,'Negro','Talla','XL',10),
+(20,'Azul','Talla','M',10),
+(20,'Azul','Talla','L',30),
+(20,'Azul','Talla','XL',6),
 
--- Casco escalada
+-- ==================== PRODUCTO 21: Casco Escalada ====================
 (21,'Naranja','Tamaño','Única',10),
 
--- Cuerda escalada
+-- ==================== PRODUCTO 22: Cuerda Escalada 50m ====================
 (22,'Azul','Longitud','50m',5),
 
--- Chaqueta rompevientos
-(23,'Blanco','Talla','M',10),
-(23,'Blanco','Talla','L',20),
-(23,'Blanco','Talla','XL',25),
+-- ==================== PRODUCTO 23: Chaqueta Rompevientos ====================
+(23,'Blanco','Talla','S',8),
+(23,'Blanco','Talla','M',14),
+(23,'Blanco','Talla','L',25),
+(23,'Blanco','Talla','XL',20),
+(23,'Negro','Talla','S',10),
+(23,'Negro','Talla','M',18),
+(23,'Negro','Talla','L',30),
+(23,'Negro','Talla','XL',22),
+(23,'Azul','Talla','S',6),
+(23,'Azul','Talla','M',12),
+(23,'Azul','Talla','L',22),
+(23,'Azul','Talla','XL',18),
 
--- Leggings
-(24,'Vino Tinto','Talla','S',28),
-(24,'Vino Tinto','Talla','M',15),
-(24,'Vino Tinto','Talla','L',8),
+-- ==================== PRODUCTO 24: Leggings Lux High-Rise ====================
+(24,'Vino Tinto','Talla','S',30),
+(24,'Vino Tinto','Talla','M',18),
+(24,'Vino Tinto','Talla','L',10),
+(24,'Vino Tinto','Talla','XL',6),
+(24,'Negro','Talla','S',35),
+(24,'Negro','Talla','M',22),
+(24,'Negro','Talla','L',14),
+(24,'Negro','Talla','XL',8),
+(24,'Gris','Talla','S',25),
+(24,'Gris','Talla','M',15),
+(24,'Gris','Talla','L',8),
+(24,'Gris','Talla','XL',5),
 
--- Termo
+-- ==================== PRODUCTO 25: Termo deportivo ====================
 (25,'Rojo','Capacidad','1L',90),
 
--- Gorra
+-- ==================== PRODUCTO 26: Gorra deportiva ====================
 (26,'Blanco','Tamaño','Única',120),
 
--- Protector bucal
+-- ==================== PRODUCTO 27: Protector bucal ====================
 (27,'Transparente','Tamaño','Única',150),
 
--- Rodilleras
-(28,'Negro','Talla','S',20),
-(28,'Negro','Talla','M',80),
-(28,'Negro','Talla','L',25),
+-- ==================== PRODUCTO 28: Rodilleras ====================
+(28,'Negro','Talla','S',25),
+(28,'Negro','Talla','M',85),
+(28,'Negro','Talla','L',30),
+(28,'Azul','Talla','S',18),
+(28,'Azul','Talla','M',50),
+(28,'Azul','Talla','L',20),
+(28,'Rojo','Talla','S',15),
+(28,'Rojo','Talla','M',40),
+(28,'Rojo','Talla','L',18),
 
--- Elíptica
+-- ==================== PRODUCTO 29: Elíptica doméstica ====================
 (29,'Negro','Tamaño','Única',8),
 
--- Garmin
+-- ==================== PRODUCTO 30: Reloj Inteligente Sport ====================
 (30,'Negro','Tamaño','Única',5),
 
--- Steps
+-- ==================== PRODUCTO 31: Steps Aeróbicos ====================
 (31,'Gris','Altura','3 niveles',12),
 (31,'Negro','Altura','3 niveles',12),
 
--- Rueda abdominal
+-- ==================== PRODUCTO 32: Rueda Abdominal Dual ====================
 (32,'Negro','Modelo','Dual',20),
 (32,'Rojo','Modelo','Dual',25),
 
--- Proteína
+-- ==================== PRODUCTO 33: Proteína Whey 2lb ====================
 (33,'Vainilla','Presentación','2lb',30),
 
--- Creatina
+-- ==================== PRODUCTO 34: Creatina Micronizada ====================
 (34,'Sin sabor','Presentación','300g',50),
 
--- Banda de frecuencia
+-- ==================== PRODUCTO 35: Banda de Frecuencia ====================
 (35,'Negro','Conectividad','Bluetooth',12),
 
--- Toalla
+-- ==================== PRODUCTO 36: Toalla Microfibra ====================
 (36,'Azul Rey','Tamaño','L',150),
 
--- Kit boxeo
-(37,'Rojo','Peso','10oz',5),
-(37,'Rojo','Peso','12oz',10),
-(37,'Rojo','Peso','14oz',5),
+-- ==================== PRODUCTO 37: Kit Boxeo Iniciación ====================
+(37,'Rojo','Peso','10oz',6),
+(37,'Rojo','Peso','12oz',12),
+(37,'Rojo','Peso','14oz',6),
+(37,'Negro','Peso','10oz',8),
+(37,'Negro','Peso','12oz',15),
+(37,'Negro','Peso','14oz',8),
+(37,'Azul','Peso','10oz',5),
+(37,'Azul','Peso','12oz',10),
+(37,'Azul','Peso','14oz',5),
 
--- Balón medicinal
+-- ==================== PRODUCTO 38: Balón medicinal 5kg ====================
 (38,'Gris','Peso','5kg',20),
 
--- Camiseta entrenamiento
-(39,'Verde Lima','Talla','S',45),
-(39,'Verde Lima','Talla','M',20),
-(39,'Verde Lima','Talla','L',15),
+-- ==================== PRODUCTO 39: Camiseta Entrenamiento ====================
+(39,'Verde Lima','Talla','S',50),
+(39,'Verde Lima','Talla','M',25),
+(39,'Verde Lima','Talla','L',18),
+(39,'Verde Lima','Talla','XL',10),
+(39,'Blanco','Talla','S',40),
+(39,'Blanco','Talla','M',20),
+(39,'Blanco','Talla','L',15),
+(39,'Blanco','Talla','XL',8),
+(39,'Negro','Talla','S',35),
+(39,'Negro','Talla','M',18),
+(39,'Negro','Talla','L',12),
+(39,'Negro','Talla','XL',6),
 
--- Shorts Tennis
-(40,'Negro','Talla','S',15),
-(40,'Negro','Talla','M',40),
-(40,'Negro','Talla','L',20),
+-- ==================== PRODUCTO 40: Shorts Tennis ====================
+(40,'Negro','Talla','S',20),
+(40,'Negro','Talla','M',45),
+(40,'Negro','Talla','L',25),
+(40,'Negro','Talla','XL',12),
+(40,'Blanco','Talla','S',18),
+(40,'Blanco','Talla','M',38),
+(40,'Blanco','Talla','L',22),
+(40,'Blanco','Talla','XL',10),
+(40,'Azul','Talla','S',15),
+(40,'Azul','Talla','M',35),
+(40,'Azul','Talla','L',20),
+(40,'Azul','Talla','XL',8),
 
--- Polo Tennis
-(41,'Blanco','Talla','M',8),
-(41,'Blanco','Talla','L',22),
-(41,'Blanco','Talla','XL',10),
+-- ==================== PRODUCTO 41: Polo Tennis ====================
+(41,'Blanco','Talla','M',12),
+(41,'Blanco','Talla','L',28),
+(41,'Blanco','Talla','XL',14),
+(41,'Negro','Talla','M',10),
+(41,'Negro','Talla','L',24),
+(41,'Negro','Talla','XL',12),
+(41,'Azul','Talla','M',8),
+(41,'Azul','Talla','L',20),
+(41,'Azul','Talla','XL',10),
 
--- Guantes gimnasio
-(42,'Gris','Talla','M',25),
-(42,'Negro','Talla','L',40),
+-- ==================== PRODUCTO 42: Guantes Gimnasio ====================
+(42,'Gris','Talla','S',20),
+(42,'Gris','Talla','M',30),
+(42,'Gris','Talla','L',15),
+(42,'Negro','Talla','S',25),
+(42,'Negro','Talla','M',35),
+(42,'Negro','Talla','L',18),
+(42,'Rojo','Talla','S',15),
+(42,'Rojo','Talla','M',25),
+(42,'Rojo','Talla','L',12),
 
--- Bolsa hidratación
+-- ==================== PRODUCTO 43: Bolsa Hidratación 2L ====================
 (43,'Azul','Capacidad','2L',20),
 
--- Muñequeras
+-- ==================== PRODUCTO 44: Muñequeras ====================
 (44,'Blanco','Tamaño','Única',200),
 
--- Balón basket oficial
+-- ==================== PRODUCTO 45: Balón basket oficial ====================
 (45,'Naranja','Tamaño','Talla 7',40);
 
 
@@ -493,86 +628,50 @@ INSERT INTO PRODUCTO_IMAGENES (ID_PRODUCTO, URL_IMAGEN, ORDEN) VALUES
 (11, 'https://cdn.awsli.com.br/2500x2500/1874/1874041/produto/316527552/8ce3492bf1b7c3fa181db681a5e34c3d-6c9p19f5r0.jpg', 2),
 (11, 'https://www.peregrinoteca.pt/uploads/media/images/zapatillas-salomon-speedcross-6-gtx-w-gris-1.jpg', 3),
 -- Producto 12
-(12, 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61', 1),
-(12, 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea', 2),
-(12, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c', 3),
 (12, 'https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/5b4417c6-4ac6-4c28-b6c1-14310053133b/M+NK+TCH+FLC+JGGR.png', 1),
 (12, 'https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/2daace5a-e572-4751-8f54-1065cfd59fbd/M+NK+TCH+FLC+JGGR.png', 2),
 (12, 'https://tse3.mm.bing.net/th/id/OIP.mmvdKlapWgfDihvxgF1Q5QHaJQ?rs=1&pid=ImgDetMain&o=7&rm=3', 3),
 -- Producto 13
-(13, 'https://images.unsplash.com/photo-1594737625785-cb7f8c6c5b60', 1),
-(13, 'https://images.unsplash.com/photo-1510017803434-a899398421b3', 2),
-(13, 'https://images.unsplash.com/photo-1548330065-c24c62094473', 3),
 (13, 'https://tse1.mm.bing.net/th/id/OIP.y0vfH5EZtjMBlnPvBM503QAAAA?rs=1&pid=ImgDetMain&o=7&rm=3', 1),
 (13, 'https://tse3.mm.bing.net/th/id/OIP.UM5jrd1sAyccGqJa0dXE2AHaHC?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (13, 'https://tse4.mm.bing.net/th/id/OIP.cIXVnA30l66efdqCdi2J2QHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 3),
 -- Producto 14
-(14, 'https://images.unsplash.com/photo-1599058917212-d750089bc07e', 1),
-(14, 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8', 2),
-(14, 'https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99', 3),
 (14, 'https://http2.mlstatic.com/D_NQ_NP_762065-MLM52326287210_112022-O-pesas-mancuernas-de-5-kilos-negro-ejercicio-pilates-yoga-gym.webp', 1),
 (14, 'https://tse1.mm.bing.net/th/id/OIP.XL59xNboKQnC70pNpncCgQHaDr?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (14, 'https://tse1.mm.bing.net/th/id/OIP.JlJNxX37Wd4pZDHLPQ2FGAHaFa?rs=1&pid=ImgDetMain&o=7&rm=3', 3),
 -- Producto 15
-(15, 'https://images.unsplash.com/photo-1584467735871-8a4aab04dffb', 1),
-(15, 'https://images.unsplash.com/photo-1598289431512-b97b0917a63e', 2),
-(15, 'https://images.unsplash.com/photo-1592432678016-e910b452f9a2', 3),
 (15, 'https://i5.walmartimages.com.mx/mg/gm/3pp/asr/fdf177bb-0518-462a-9c7d-8569fd2b5fc8.b4f2a229ecab3fa908e54d564f4e2bce.jpeg?odnHeight=2000&odnWidth=2000&odnBg=ffffff', 1),
 (15, 'https://tse3.mm.bing.net/th/id/OIP.a1CvVT0SiMyxXqLGmnmIqAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (15, 'https://tse1.mm.bing.net/th/id/OIP.NcZ7U5jLcUDRdX8NddnzkAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 3),
 -- Producto 16
-(16, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff', 1),
-(16, 'https://images.unsplash.com/photo-1634484521128-4f1082260661', 2),
-(16, 'https://images.unsplash.com/photo-1523275335684-37898b6baf30', 3),
 (16, 'https://tse2.mm.bing.net/th/id/OIP.Qf65pdGXiTsotVd3YVbJTwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 1),
 (16, 'https://tse1.mm.bing.net/th/id/OIP.hpc1al9NSYqL_F5EqID7jgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (16, 'https://http2.mlstatic.com/D_NQ_NP_910107-MLU73392892391_122023-O.webp', 3),
 -- Producto 17
-(17, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e', 1),
-(17, 'https://images.unsplash.com/photo-1544919982-b61976f0ba43', 2),
-(17, 'https://images.unsplash.com/photo-1606902960316-39f264e839ed', 3),
 (17, 'https://tse3.mm.bing.net/th/id/OIP.-ab8CskV3xol9PQPEdkzpwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 1),
 (17, 'https://tse1.mm.bing.net/th/id/OIP.3IctO49ygGWGCHLkrH8FiwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (17, 'https://tse4.mm.bing.net/th/id/OIP.m4oDdXkm_MxalC1igty8VAHaIx?rs=1&pid=ImgDetMain&o=7&rm=3', 3),
 -- Producto 18
-(18, 'https://images.unsplash.com/photo-1574629810360-7efbbe195018', 1),
-(18, 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48', 2),
-(18, 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b', 3),
 (18, 'https://tse2.mm.bing.net/th/id/OIP.J7-Ln3KvYbhjeH9cxT_d_QHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 1),
 (18, 'https://tse2.mm.bing.net/th/id/OIP.wGCsGdPqcCoGK_Q_RidxYAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (18, 'https://mundodeportivo.com.co/wp-content/uploads/8-709900011.webp', 3),
 -- Producto 19
-(19, 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a', 1),
-(19, 'https://images.unsplash.com/photo-1518611012118-296032bb947a', 2),
-(19, 'https://images.unsplash.com/photo-1594458396597-073c65918314', 3),
 (19, 'https://resources.claroshop.com/medios-plazavip/s2/10382/4867612/64898830c1af4-casbel1270-1600x1600.jpg', 1),
 (19, 'https://tse2.mm.bing.net/th/id/OIP.kqWHR5_QTWMPFdPy4VypBAHaFm?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (19, 'https://www.sumitate.com.uy/img/articulos/casco_ciclismo_ruta_bell_z20_aero_mips_2_imagen3.jpg', 3),
 -- Producto 20
-(20, 'https://images.unsplash.com/photo-1628153322151-35a12d307991', 1),
-(20, 'https://images.unsplash.com/photo-1551830820-330a71b99659', 2),
-(20, 'https://images.unsplash.com/photo-1626015413325-0150215da7c2', 3),
 (20, 'https://i.pinimg.com/736x/36/80/59/368059e80767b467d1d1732f875cb8be.jpg', 1),
 (20, 'https://http2.mlstatic.com/D_NQ_NP_724747-MLA50331197972_062022-O.webp', 2),
 (20, 'https://tse4.mm.bing.net/th/id/OIP.pNFp0EYDV3Z4aD1K_W-P-AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 3),
 -- Producto 21
-(21, 'https://images.unsplash.com/photo-1560769629-975ec94e6a86', 1),
-(21, 'https://images.unsplash.com/photo-1606335543042-57c525922933', 2),
-(21, 'https://images.unsplash.com/photo-1519315901367-f34ff9154487', 3),
 (21, 'https://tse4.mm.bing.net/th/id/OIP.SJbsM5X4V0JAjYcSGZ93SwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 1),
 (21, 'https://tse1.mm.bing.net/th/id/OIP.THgWjS2SCF70f1MVX9RJTgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (21, 'https://tse2.mm.bing.net/th/id/OIP.OP_fbNQVmD_RVpUUUxW5xgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 3),
 -- Producto 22
-(22, 'https://images.unsplash.com/photo-1511191988486-103bc3cb8002', 1),
-(22, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab', 2),
-(22, 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519', 3),
 (22, 'https://tse2.mm.bing.net/th/id/OIP.K9hlXVTm34HA34IgqyV71QAAAA?rs=1&pid=ImgDetMain&o=7&rm=3', 1),
 (22, 'https://tse1.mm.bing.net/th/id/OIP.nFXHtg52dDGajpOYc5jv3AAAAA?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (22, 'https://zendavertical.com/wp-content/uploads/2020/09/R32AY-Mambo-jaune-pack_LowRes_zendavertical.jpeg', 3),
 -- Producto 23
-(23, 'https://images.unsplash.com/photo-1622279457486-62dcc4a497c4', 1),
-(23, 'https://images.unsplash.com/photo-1517649763962-0c623066013b', 2),
-(23, 'https://images.unsplash.com/photo-1519861531473-9200262188bf', 3),
 (23, 'https://i5.walmartimages.com.mx/mg/gm/3pp/asr/9138cf4e-34c8-4395-9f90-bce853566c92.3695c56e78748f0252b2aa43da1616d0.jpeg?odnHeight=2000&odnWidth=2000&odnBg=ffffff', 1),
 (23, 'https://tse3.mm.bing.net/th/id/OIP.oJ7ncNFPeUxfaWHAaWbVWgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', 2),
 (23, 'https://dpjye2wk9gi5z.cloudfront.net/wcsstore/ExtendedSitesCatalogAssetStore/images/catalog/zoom/3019246-0100V1.jpg', 3),
@@ -751,41 +850,43 @@ INSERT INTO METODOS_PAGO (NOMBRE_METODO, DESCRIPCION) VALUES
 ('QR Bancario', 'Pago por código QR'),
 ('Bitcoin', 'Pago con criptomoneda');
 
+
+-- ==============================
+-- METODOS DE PAGO
+-- ==============================
+
+CREATE TABLE USUARIOS_METODOS_PAGO (
+  ID INT PRIMARY KEY AUTO_INCREMENT,
+  ID_USUARIO INT NOT NULL,
+  ID_METODO INT NOT NULL,
+  TITULAR VARCHAR(100) DEFAULT NULL,
+  TELEFONO VARCHAR(20) DEFAULT NULL,
+  BANCO VARCHAR(100) DEFAULT NULL,
+  TIPO VARCHAR(20) DEFAULT NULL,
+  ES_PRINCIPAL TINYINT DEFAULT 0,
+  FECHA_CREADO DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO),
+  FOREIGN KEY (ID_METODO) REFERENCES METODOS_PAGO(ID_METODO)
+);
+
+
 -- ==============================
 -- VENTAS
 -- ==============================
 CREATE TABLE VENTAS (
     ID_VENTA INT PRIMARY KEY AUTO_INCREMENT,
     ID_CLIENTE INT,
-    ID_EMPLEADO INT NULL, -- Ajustado: Ahora puede ser NULL si se compra directo desde la web
+    ID_EMPLEADO INT NULL,
     FECHA_VENTA DATETIME,
+    DATOS_PAGO JSON DEFAULT NULL,
     TOTAL DECIMAL(10,2),
     ESTADO VARCHAR(50) DEFAULT 'COMPLETADA',
     ID_METODO INT,
     REFERENCIA_PAGO VARCHAR(100) DEFAULT NULL, -- Agregado: Para el código de la pasarela
-    FOREIGN KEY (ID_CLIENTE) REFERENCES CLIENTES(ID_CLIENTE),
     FOREIGN KEY (ID_EMPLEADO) REFERENCES EMPLEADOS(ID_EMPLEADO),
     FOREIGN KEY (ID_METODO) REFERENCES METODOS_PAGO(ID_METODO)
 );
 
-INSERT INTO VENTAS
-(ID_CLIENTE, ID_EMPLEADO, FECHA_VENTA, TOTAL, ESTADO, ID_METODO)
-VALUES
-(1, 1, '2025-01-05 10:15:00', 150000.00, 'COMPLETADA', 2),
-(2, 2, '2025-01-06 11:20:00', 260000.00, 'COMPLETADA', 3),
-(3, 1, '2025-01-07 14:05:00', 95000.00, 'COMPLETADA', 1),
-(4, 3, '2025-01-08 09:30:00', 225000.00, 'COMPLETADA', 5),
-(5, 4, '2025-01-09 16:45:00', 35000.00, 'COMPLETADA', 4),
-(6, 5, '2025-01-10 12:10:00', 145000.00, 'COMPLETADA', 6),
-(7, 6, '2025-01-11 15:30:00', 45000.00, 'COMPLETADA', 2),
-(8, 7, '2025-01-12 17:00:00', 60000.00, 'COMPLETADA', 3),
-(9, 8, '2025-01-13 13:25:00', 40000.00, 'COMPLETADA', 1),
-(10, 9, '2025-01-14 18:40:00', 270000.00, 'COMPLETADA', 7),
-(11, 10, '2025-01-15 10:55:00', 1800000.00, 'COMPLETADA', 3),
-(12, 11, '2025-01-16 11:15:00', 150000.00, 'COMPLETADA', 8),
-(13, 12, '2025-01-17 16:10:00', 70000.00, 'COMPLETADA', 5),
-(14, 1, '2025-01-18 09:50:00', 110000.00, 'COMPLETADA', 6),
-(15, 2, '2025-01-19 14:35:00', 50000.00, 'COMPLETADA', 2);
 
 -- ==============================
 -- DETALLE VENTAS
@@ -801,28 +902,6 @@ CREATE TABLE DETALLE_VENTAS (
     FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID)
 );
 
-INSERT INTO DETALLE_VENTAS
-(ID_VENTA, ID_PRODUCTO, CANTIDAD, PRECIO_UNITARIO, SUBTOTAL)
-VALUES
-(1, 11, 1, 150000.00, 150000.00),
-(2, 3, 1, 220000.00, 220000.00),
-(2, 10, 1, 40000.00, 40000.00),
-(3, 6, 1, 95000.00, 95000.00),
-(4, 2, 1, 180000.00, 180000.00),
-(4, 8, 1, 45000.00, 45000.00),
-(5, 5, 1, 35000.00, 35000.00),
-(6, 1, 1, 120000.00, 120000.00),
-(6, 7, 1, 25000.00, 25000.00),
-(7, 8, 1, 45000.00, 45000.00),
-(8, 9, 1, 60000.00, 60000.00),
-(9, 10, 1, 40000.00, 40000.00),
-(10, 11, 1, 150000.00, 150000.00),
-(10, 1, 1, 120000.00, 120000.00),
-(11, 13, 1, 1800000.00, 1800000.00),
-(12, 14, 1, 150000.00, 150000.00),
-(13, 15, 1, 70000.00, 70000.00),
-(14, 4, 1, 110000.00, 110000.00),
-(15, 12, 1, 50000.00, 50000.00);
 
 -- ==============================
 -- ENVIOS
@@ -832,15 +911,16 @@ CREATE TABLE ENVIOS (
     ID_VENTA INT,
     DIRECCION_ENVIO VARCHAR(255),
     CIUDAD VARCHAR(100),
+    BARRIO VARCHAR(100) DEFAULT NULL,
+  DEPARTAMENTO VARCHAR(100) DEFAULT NULL,
+  CODIGO_POSTAL VARCHAR(20) DEFAULT NULL,
+  OBSERVACIONES TEXT DEFAULT NULL,
+  TELEFONO_CONTACTO VARCHAR(20) DEFAULT NULL,
     ESTADO_ENVIO VARCHAR(50),
     FECHA_ENVIO DATE,
     FOREIGN KEY (ID_VENTA) REFERENCES VENTAS(ID_VENTA)
 );
 
-INSERT INTO ENVIOS
-(ID_VENTA, DIRECCION_ENVIO, CIUDAD, ESTADO_ENVIO, FECHA_ENVIO)
-VALUES
-(1, 'Cra 10 #20-30', 'Bogotá', 'En camino', '2025-06-02');
 
 -- ==============================
 -- MOVIMIENTOS STOCK
@@ -872,12 +952,6 @@ CREATE TABLE FAVORITOS (
     FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID)
 );
 
-INSERT INTO FAVORITOS
-(ID_USUARIO, ID_PRODUCTO, FECHA_AGREGADO)
-VALUES
-(1, 1, '2025-06-01'),
-(2, 2, '2025-06-02');
-
 -- ==============================
 -- CARRITO DE COMPRAS
 -- ==============================
@@ -885,10 +959,14 @@ CREATE TABLE CARRITO (
     ID_CARRITO INT PRIMARY KEY AUTO_INCREMENT,
     ID_USUARIO INT NOT NULL,
     ID_PRODUCTO INT NOT NULL,
+    ID_VARIANTE INT NULL,
+
     CANTIDAD INT NOT NULL DEFAULT 1,
     FECHA_AGREGADO TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO) ON DELETE CASCADE,
-    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID) ON DELETE CASCADE
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID) ON DELETE CASCADE,
+    FOREIGN KEY (ID_VARIANTE) REFERENCES PRODUCTO_VARIANTES(ID_VARIANTE) ON DELETE SET NULL
 );
 
 -- ==============================
@@ -917,13 +995,131 @@ CREATE TABLE PRODUCTO_CARACTERISTICAS (
     FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID) ON DELETE CASCADE
 );
 
+-- ==============================
+-- Peticiones, Quejas y Reclamos
+-- ==============================
+
+CREATE TABLE PQR (
+  ID_PQR INT AUTO_INCREMENT PRIMARY KEY,
+  ID_USUARIO INT NOT NULL,
+  TIPO VARCHAR(50) NOT NULL,
+  ASUNTO VARCHAR(255) NOT NULL,
+  DESCRIPCION TEXT NOT NULL,
+  NUMERO_PEDIDO VARCHAR(50) DEFAULT NULL,
+  FECHA DATETIME NOT NULL,
+  ESTADO VARCHAR(50) DEFAULT 'PENDIENTE',
+  FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO)
+);
+
+-- ==============================
+-- Historial de usuario
+-- ==============================
+
+CREATE TABLE HISTORIAL (
+    ID_HISTORIAL INT PRIMARY KEY AUTO_INCREMENT,
+    ID_USUARIO INT,
+    ID_PRODUCTO INT,
+    FECHA_VISTO DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO),
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID)
+);
+
+-- ==============================
+-- Retos
+-- ==============================
+
+
+CREATE TABLE RETOS (
+  ID_RETO INT PRIMARY KEY AUTO_INCREMENT,
+  TITULO VARCHAR(200) NOT NULL,
+  DESCRIPCION TEXT,
+  META_TIPO VARCHAR(50) NOT NULL,
+  META_VALOR INT NOT NULL,
+  RECOMPENSA_PORCENTAJE DECIMAL(5,2) NOT NULL,
+  FECHA_INICIO DATE NOT NULL,
+  FECHA_FIN DATE NOT NULL,
+  ACTIVO TINYINT DEFAULT 1
+);
+
+-- ==============================
+-- Retos a cada usuario
+-- ==============================
+
+
+CREATE TABLE RETOS_USUARIOS (
+  ID_RETO_USUARIO INT PRIMARY KEY AUTO_INCREMENT,
+  ID_RETO INT NOT NULL,
+  ID_USUARIO INT NOT NULL,
+  PROGRESO INT DEFAULT 0,
+  COMPLETADO TINYINT DEFAULT 0,
+  CUPON_GENERADO VARCHAR(50) DEFAULT NULL,
+  FOREIGN KEY (ID_RETO) REFERENCES RETOS(ID_RETO),
+  FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO)
+);
+
+INSERT INTO RETOS (ID_RETO, TITULO, DESCRIPCION, META_TIPO, META_VALOR, RECOMPENSA_PORCENTAJE, FECHA_INICIO, FECHA_FIN) VALUES
+(1, 'Semana Activa', 'Completa 5 sesiones de entrenamiento de al menos 30 minutos en una semana', 'sesiones', 5, 10.00, '2026-01-01', '2026-12-31'),
+(2, 'Maratón de Km', 'Acumula 15 kilómetros corriendo o caminando', 'km', 15, 15.00, '2026-01-01', '2026-12-31'),
+(3, 'Racha Imparable', 'Entrena 7 días consecutivos sin saltarte ninguno', 'dias', 7, 20.00, '2026-01-01', '2026-12-31'),
+(4, 'Reto Fuerza', 'Completa 10 sesiones de gimnasio o pesas', 'sesiones', 10, 12.00, '2026-01-01', '2026-12-31');
+
+
+-- ==============================
+-- Planes de entremamiento
+-- ==============================
+
+CREATE TABLE PLANTILLAS_PLANES (
+  ID_PLANTILLA INT PRIMARY KEY AUTO_INCREMENT,
+  ID_CATEGORIA INT,
+  TITULO VARCHAR(200) NOT NULL,
+  DESCRIPCION TEXT,
+  DURACION_DIAS INT DEFAULT 14,
+  NIVEL VARCHAR(50) DEFAULT 'Principiante',
+  CONTENIDO JSON,
+  FOREIGN KEY (ID_CATEGORIA) REFERENCES CATEGORIAS(ID_CATEGORIA)
+);
+
+-- ==============================
+-- Planes de entrenamiento cada usuario
+-- ==============================
+
+CREATE TABLE PLANES_USUARIO (
+  ID_PLAN INT PRIMARY KEY AUTO_INCREMENT,
+  ID_USUARIO INT NOT NULL,
+  ID_VENTA INT,
+  ID_PLANTILLA INT NOT NULL,
+  FECHA_INICIO DATE,
+  COMPLETADO TINYINT DEFAULT 0,
+  FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO),
+  FOREIGN KEY (ID_VENTA) REFERENCES VENTAS(ID_VENTA),
+  FOREIGN KEY (ID_PLANTILLA) REFERENCES PLANTILLAS_PLANES(ID_PLANTILLA)
+);
+
+INSERT INTO PLANTILLAS_PLANES (ID_PLANTILLA, ID_CATEGORIA, TITULO, DESCRIPCION, DURACION_DIAS, NIVEL, CONTENIDO) VALUES
+(1, 4, 'De Couch a 5K', 'Plan progresivo para empezar a correr desde cero', 21, 'Principiante', '[{"dia":1,"actividad":"Caminata 20 min","series":1},{"dia":2,"actividad":"Descanso activo - estiramientos","series":1},{"dia":3,"actividad":"Caminata 25 min + trote 5 min","series":1},{"dia":4,"actividad":"Descanso","series":0},{"dia":5,"actividad":"Trote 15 min + caminata 10 min","series":1},{"dia":6,"actividad":"Caminata 30 min","series":1},{"dia":7,"actividad":"Descanso","series":0}]'),
+(2, 3, 'Salto y Velocidad', 'Mejora tu salto vertical y rapidez en la cancha', 14, 'Intermedio', '[{"dia":1,"actividad":"Saltos a la cuerda 10 min","series":3},{"dia":2,"actividad":"Sentadillas + saltos","series":4},{"dia":3,"actividad":"Descanso","series":0},{"dia":4,"actividad":"Sprints 30m","series":6},{"dia":5,"actividad":"Saltos en cajón","series":4},{"dia":6,"actividad":"Estocadas con salto","series":3},{"dia":7,"actividad":"Descanso","series":0}]'),
+(3, 5, 'Full Body Principiantes', 'Rutina completa de gimnasio para empezar con buen pie', 14, 'Principiante', '[{"dia":1,"actividad":"Press banca + Remo","series":3},{"dia":2,"actividad":"Sentadilla + Peso muerto","series":3},{"dia":3,"actividad":"Descanso","series":0},{"dia":4,"actividad":"Hombros + Bíceps","series":3},{"dia":5,"actividad":"Espalda + Tríceps","series":3},{"dia":6,"actividad":"Cardio 20 min + abdomen","series":3},{"dia":7,"actividad":"Descanso","series":0}]'),
+(4, 2, 'Resistencia y Agilidad', 'Entrenamiento para futbolistas enfocado en condición física', 14, 'Intermedio', '[{"dia":1,"actividad":"Trote continuo 20 min","series":1},{"dia":2,"actividad":"Circuitos de agilidad (conos)","series":4},{"dia":3,"actividad":"Descanso","series":0},{"dia":4,"actividad":"Sprints con cambios de dirección","series":6},{"dia":5,"actividad":"Pases y control de balón","series":4},{"dia":6,"actividad":"Partido reducido 30 min","series":1},{"dia":7,"actividad":"Descanso","series":0}]'),
+(5, 7, 'Fondo de Pierna', 'Plan para ciclistas que buscan aumentar resistencia', 14, 'Intermedio', '[{"dia":1,"actividad":"Ruta plana 20 km","series":1},{"dia":2,"actividad":"Series de pedaleo rápido","series":5},{"dia":3,"actividad":"Descanso","series":0},{"dia":4,"actividad":"Subidas 10 km","series":1},{"dia":5,"actividad":"Ruta recreativa 30 km","series":1},{"dia":6,"actividad":"Estiramientos + Core","series":3},{"dia":7,"actividad":"Descanso","series":0}]'),
+(6, 6, 'Técnica y Respiración', 'Plan de natación para mejorar técnica y capacidad pulmonar', 14, 'Principiante', '[{"dia":1,"actividad":"Técnica de brazada 200m","series":4},{"dia":2,"actividad":"Ejercicios de respiración","series":5},{"dia":3,"actividad":"Descanso","series":0},{"dia":4,"actividad":"Patada con tabla 300m","series":3},{"dia":5,"actividad":"Estilo libre 500m","series":1},{"dia":6,"actividad":"Combinado 400m","series":1},{"dia":7,"actividad":"Descanso","series":0}]');
+
+
+
+
+CREATE TABLE IF NOT EXISTS sessions (
+  session_id VARCHAR(128) NOT NULL,
+  expires INT UNSIGNED NOT NULL,
+  data MEDIUMTEXT,
+  PRIMARY KEY (session_id)
+);
+
 
 
 select * from USUARIOS;
 select * from productos;
 DELETE FROM USUARIOS WHERE EMAIL = 'yeisiton922@gmail.com';
 DELETE FROM USUARIOS WHERE EMAIL = 'yeisonfernandez2022@gmail.com';
-DELETE FROM USUARIOS WHERE EMAIL = 'yeison2004@hotmail.es';
+DELETE FROM USUARIOS WHERE EMAIL = 'durodrigo22montengero@gmail.com';
 
 
 -- ----------------------------------------
@@ -943,4 +1139,3 @@ ORDER BY PRODUCTOS.ID, PI.ORDEN;
 SELECT * FROM CARRITO WHERE ID_USUARIO = 16;
 SHOW TABLES;
 select * from PRODUCTOS;
-
